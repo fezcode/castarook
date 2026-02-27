@@ -12,6 +12,8 @@ export const useChessGame = () => {
   const [winner, setWinner] = useState<'white' | 'black' | null>(null);
   const [isNight, setIsNight] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [fogNear, setFogNear] = useState(10);
+  const [fogFar, setFogFar] = useState(80);
 
   const resetGame = () => {
     setPieces(setupBoard());
@@ -135,6 +137,10 @@ export const useChessGame = () => {
     winner,
     isNight,
     hasStarted,
+    fogNear,
+    fogFar,
+    setFogNear,
+    setFogFar,
     setHasStarted,
     setIsNight,
     setIsPaused,

@@ -10,13 +10,21 @@ interface Props {
   winner: 'white' | 'black' | null;
   isNight: boolean;
   hasStarted: boolean;
+  fogNear: number;
+  fogFar: number;
+  setFogNear: (val: number) => void;
+  setFogFar: (val: number) => void;
   setHasStarted: (started: boolean) => void;
   setIsNight: (night: boolean) => void;
   setIsPaused: (paused: boolean) => void;
   resetGame: () => void;
 }
 
-export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pieces, isPaused, winner, isNight, hasStarted, setHasStarted, setIsNight, setIsPaused, resetGame }) => {
+export const GameUI: React.FC<Props> = ({ 
+  turn, selectedPiece, battleResult, pieces, isPaused, winner, isNight, hasStarted, 
+  fogNear, fogFar, setFogNear, setFogFar,
+  setHasStarted, setIsNight, setIsPaused, resetGame 
+}) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
   const whitePieces = pieces.filter(p => p.color === 'white');
   const blackPieces = pieces.filter(p => p.color === 'black');
@@ -62,70 +70,120 @@ export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pie
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'rgba(0, 0, 0, 0.85)',
+          background: 'radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%)',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           pointerEvents: 'auto',
-          zIndex: 40
+          zIndex: 40,
+          backdropFilter: 'blur(4px)'
         }}>
           <div style={{
-            background: 'linear-gradient(135deg, #424242, #1a1a1a)',
-            padding: '60px 80px',
-            borderRadius: '24px',
             textAlign: 'center',
-            boxShadow: '0 0 60px rgba(0,0,0,0.9)',
-            border: '2px solid #ffeb3b',
-            animation: 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            animation: 'popIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
           }}>
-            <h1 style={{ 
-              color: '#ffeb3b', 
-              fontSize: '72px', 
-              margin: '0 0 10px 0', 
+            {/* Decorative Top Accent */}
+            <div style={{ width: '100px', height: '2px', background: '#d4af37', margin: '0 auto 20px auto', boxShadow: '0 0 10px #d4af37' }}></div>
+            
+            <h2 style={{ 
+              color: '#d4af37', 
+              fontSize: '24px', 
+              margin: 0, 
               textTransform: 'uppercase', 
-              letterSpacing: '8px',
-              fontStyle: 'italic'
+              letterSpacing: '6px',
+              fontFamily: 'serif',
+              opacity: 0.8
             }}>
-              RPG CHESS
+              A Strategic Saga
+            </h2>
+            
+            <h1 style={{ 
+              color: '#fff', 
+              fontSize: '100px', 
+              margin: '5px 0 30px 0', 
+              textTransform: 'uppercase', 
+              letterSpacing: '12px',
+              fontFamily: 'serif',
+              fontWeight: 'bold',
+              textShadow: '0 0 20px rgba(212, 175, 55, 0.5), 2px 2px 0px #000'
+            }}>
+              RPG<span style={{ color: '#d4af37' }}>CHESS</span>
             </h1>
-            <p style={{ color: '#aaa', fontSize: '24px', marginBottom: '50px', letterSpacing: '2px' }}>
-              Roll for Initiative!
+
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px',
+              width: '320px',
+              margin: '0 auto'
+            }}>
+              <button 
+                onClick={() => setHasStarted(true)} 
+                style={{ 
+                  ...menuButtonStyle, 
+                  background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)',
+                  color: '#000',
+                  border: '2px solid #fff',
+                  fontSize: '24px', 
+                  fontWeight: 'bold', 
+                  fontFamily: 'serif',
+                  padding: '15px',
+                  textTransform: 'uppercase',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 0 20px #d4af37';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.5)';
+                }}
+              >
+                Start Campaign
+              </button>
+              
+              <button 
+                onClick={() => { setIsTutorialOpen(true); }}
+                style={{ 
+                  ...menuButtonStyle, 
+                  background: 'rgba(0,0,0,0.6)',
+                  color: '#d4af37',
+                  border: '1px solid #d4af37',
+                  fontSize: '18px', 
+                  fontFamily: 'serif',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.6)'}
+              >
+                Learn the Rules
+              </button>
+
+              <button 
+                style={{ 
+                  ...menuButtonStyle, 
+                  background: 'rgba(0,0,0,0.6)',
+                  color: '#aaa',
+                  border: '1px solid #444',
+                  fontSize: '18px', 
+                  fontFamily: 'serif',
+                  textTransform: 'uppercase',
+                  cursor: 'not-allowed'
+                }}
+              >
+                Multiplayer (Coming)
+              </button>
+            </div>
+
+            {/* Decorative Bottom Accent */}
+            <div style={{ width: '200px', height: '1px', background: 'rgba(212, 175, 55, 0.3)', margin: '40px auto 0 auto' }}></div>
+            <p style={{ color: '#666', fontSize: '12px', marginTop: '10px', textTransform: 'uppercase', letterSpacing: '2px' }}>
+              Built for the Workhammer Suite
             </p>
-            
-            <button 
-              onClick={() => setHasStarted(true)} 
-              style={{ 
-                ...menuButtonStyle, 
-                background: '#1976d2', 
-                fontSize: '28px', 
-                fontWeight: 'bold', 
-                padding: '20px 60px',
-                width: 'auto',
-                margin: '0 auto',
-                boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
-                transition: 'transform 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              ENTER BATTLE
-            </button>
-            
-            <button 
-              onClick={() => { setIsTutorialOpen(true); }}
-              style={{ 
-                background: 'none', 
-                border: 'none', 
-                color: '#aaa', 
-                marginTop: '30px', 
-                cursor: 'pointer',
-                fontSize: '18px',
-                textDecoration: 'underline'
-              }}
-            >
-              How to Play
-            </button>
           </div>
         </div>
       )}
@@ -152,13 +210,16 @@ export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pie
 
         {/* Top Center: Turn Indicator */}
         <div style={{
-          background: 'rgba(0,0,0,0.8)',
-          color: 'white',
-          padding: '10px 20px',
+          background: turn === 'white' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.95)',
+          color: turn === 'white' ? '#000' : '#fff',
+          padding: '10px 30px',
           borderRadius: '8px',
           fontSize: '24px',
           fontWeight: 'bold',
-          textTransform: 'uppercase'
+          textTransform: 'uppercase',
+          border: `2px solid ${turn === 'white' ? '#000' : '#fff'}`,
+          boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+          transition: 'all 0.3s ease'
         }}>
           {turn}'s Turn
         </div>
@@ -330,6 +391,26 @@ export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pie
             <button onClick={() => setIsNight(!isNight)} style={{ ...menuButtonStyle, background: isNight ? '#5c6bc0' : '#ffa726' }}>
               Switch to {isNight ? 'Day' : 'Night'} Mode
             </button>
+
+            <div style={{ background: '#333', padding: '15px', borderRadius: '8px', marginBottom: '15px' }}>
+              <div style={{ color: 'white', marginBottom: '10px' }}>Fog Intensity</div>
+              <div style={{ display: 'flex', alignItems: 'center', color: '#aaa', fontSize: '14px' }}>
+                <span style={{ width: '80px' }}>Near: {fogNear}</span>
+                <input 
+                  type="range" min="0" max="50" step="1" value={fogNear} 
+                  onChange={(e) => setFogNear(parseInt(e.target.value))}
+                  style={{ flex: 1, pointerEvents: 'auto' }}
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', color: '#aaa', fontSize: '14px', marginTop: '5px' }}>
+                <span style={{ width: '80px' }}>Far: {fogFar}</span>
+                <input 
+                  type="range" min="10" max="200" step="1" value={fogFar} 
+                  onChange={(e) => setFogFar(parseInt(e.target.value))}
+                  style={{ flex: 1, pointerEvents: 'auto' }}
+                />
+              </div>
+            </div>
 
             <button onClick={() => alert('Settings menu coming soon!')} style={menuButtonStyle}>
               Options

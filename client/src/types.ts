@@ -5,6 +5,7 @@ export interface Piece {
   id: string;
   type: PieceType;
   color: PlayerColor;
+  secondaryColor?: string;
   x: number;
   y: number;
   kills: number;

@@ -17,9 +17,10 @@ export const setupBoard = (): Piece[] => {
 
   const createPiece = (type: PieceType, color: PlayerColor, x: number, y: number): Piece => {
     const hp = getInitialHp(type);
+    const secondaryColor = color === 'white' ? '#d4af37' : '#ff5252'; // Gold for white, Bright red for black
     return {
       id: `${type}-${color}-${x}-${y}-${Math.random().toString(36).substr(2, 9)}`,
-      type, color, x, y, kills: 0, defends: 0, hp, maxHp: hp
+      type, color, secondaryColor, x, y, kills: 0, defends: 0, hp, maxHp: hp
     };
   };
 
