@@ -407,13 +407,12 @@ export const GameUI: React.FC<Props> = ({
       {/* Bottom Right: War Chronicles */}
       <div style={{
         position: 'absolute',
-        bottom: 0,
+        bottom: '20px',
         right: '20px',
         width: '380px',
         height: '240px',
         ...aoeBoxStyle,
-        borderRadius: '8px 8px 0 0',
-        borderBottom: 'none',
+        borderRadius: '8px',
         display: 'flex',
         flexDirection: 'column',
         pointerEvents: 'auto',
