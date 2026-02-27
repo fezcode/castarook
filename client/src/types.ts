@@ -9,6 +9,8 @@ export interface Piece {
   y: number;
   kills: number;
   defends: number;
+  hp: number;
+  maxHp: number;
 }
 
 export interface Position {

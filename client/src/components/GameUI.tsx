@@ -9,12 +9,15 @@ interface Props {
   isPaused: boolean;
   winner: 'white' | 'black' | null;
   isNight: boolean;
+  hasStarted: boolean;
+  setHasStarted: (started: boolean) => void;
   setIsNight: (night: boolean) => void;
   setIsPaused: (paused: boolean) => void;
   resetGame: () => void;
 }
 
-export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pieces, isPaused, winner, isNight, setIsNight, setIsPaused, resetGame }) => {
+export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pieces, isPaused, winner, isNight, hasStarted, setHasStarted, setIsNight, setIsPaused, resetGame }) => {
+  const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
   const whitePieces = pieces.filter(p => p.color === 'white');
   const blackPieces = pieces.filter(p => p.color === 'black');
   
@@ -50,6 +53,82 @@ export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pie
       justifyContent: 'space-between',
       fontFamily: 'sans-serif'
     }}>
+
+      {/* Start Game Overlay */}
+      {!hasStarted && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.85)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          pointerEvents: 'auto',
+          zIndex: 40
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #424242, #1a1a1a)',
+            padding: '60px 80px',
+            borderRadius: '24px',
+            textAlign: 'center',
+            boxShadow: '0 0 60px rgba(0,0,0,0.9)',
+            border: '2px solid #ffeb3b',
+            animation: 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          }}>
+            <h1 style={{ 
+              color: '#ffeb3b', 
+              fontSize: '72px', 
+              margin: '0 0 10px 0', 
+              textTransform: 'uppercase', 
+              letterSpacing: '8px',
+              fontStyle: 'italic'
+            }}>
+              RPG CHESS
+            </h1>
+            <p style={{ color: '#aaa', fontSize: '24px', marginBottom: '50px', letterSpacing: '2px' }}>
+              Roll for Initiative!
+            </p>
+            
+            <button 
+              onClick={() => setHasStarted(true)} 
+              style={{ 
+                ...menuButtonStyle, 
+                background: '#1976d2', 
+                fontSize: '28px', 
+                fontWeight: 'bold', 
+                padding: '20px 60px',
+                width: 'auto',
+                margin: '0 auto',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.4)',
+                transition: 'transform 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              ENTER BATTLE
+            </button>
+            
+            <button 
+              onClick={() => { setIsTutorialOpen(true); }}
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: '#aaa', 
+                marginTop: '30px', 
+                cursor: 'pointer',
+                fontSize: '18px',
+                textDecoration: 'underline'
+              }}
+            >
+              How to Play
+            </button>
+          </div>
+        </div>
+      )}
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         {/* Top Left: Score Board */}
@@ -105,6 +184,55 @@ export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pie
           </button>
         </div>
       </div>
+
+      {/* Tutorial Overlay */}
+      {isTutorialOpen && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          pointerEvents: 'auto',
+          zIndex: 50
+        }}>
+          <div style={{
+            background: '#222',
+            color: 'white',
+            padding: '40px',
+            borderRadius: '16px',
+            maxWidth: '600px',
+            boxShadow: '0 8px 32px rgba(0,0,0,1)',
+            textAlign: 'center'
+          }}>
+            <h1 style={{ color: '#ffeb3b', marginTop: 0 }}>Battle & Health Tutorial</h1>
+            <p>Welcome to RPG Chess! Pieces now have health and don't always die in one hit.</p>
+            <ul style={{ textAlign: 'left', lineHeight: '1.6' }}>
+              <li><strong>Combat:</strong> When attacking, both pieces roll a D20 and add their stats.</li>
+              <li><strong>Damage:</strong> The difference between the two totals is dealt as damage to the loser's health.</li>
+              <li><strong>Health Points (HP):</strong>
+                <ul>
+                  <li>Pawn: 10 HP</li>
+                  <li>Knight / Bishop: 20 HP</li>
+                  <li>Rook: 30 HP</li>
+                  <li>Queen: 40 HP</li>
+                  <li>King: 50 HP</li>
+                </ul>
+              </li>
+              <li><strong>Elimination:</strong> A piece is only removed when its health reaches 0.</li>
+              <li><strong>Capture:</strong> The attacker only moves to the target square if they kill the defender.</li>
+            </ul>
+            <button onClick={() => setIsTutorialOpen(false)} style={{ ...menuButtonStyle, background: '#1976d2', marginTop: '20px' }}>
+              Got it!
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Game Over Overlay */}
       {winner && (
@@ -189,6 +317,10 @@ export const GameUI: React.FC<Props> = ({ turn, selectedPiece, battleResult, pie
             
             <button onClick={() => setIsPaused(false)} style={menuButtonStyle}>
               Resume
+            </button>
+
+            <button onClick={() => { setIsTutorialOpen(true); setIsPaused(false); }} style={menuButtonStyle}>
+              Tutorial / Help
             </button>
             
             <button onClick={resetGame} style={{ ...menuButtonStyle, background: '#d32f2f' }}>

@@ -121,10 +121,42 @@ export const ChessPiece: React.FC<Props> = ({ piece, isSelected, onClick }) => {
       onPointerOut={() => setHovered(false)}
     >
       {getGeometry()}
+
+      {/* Health Bar Billboard */}
+      <Billboard position={[0, 1.8, 0]} follow={true}>
+        <group>
+          {/* Outer Border */}
+          <mesh position={[0, 0, -0.02]}>
+            <planeGeometry args={[0.64, 0.14]} />
+            <meshBasicMaterial color="black" />
+          </mesh>
+          {/* Background (dark gray) */}
+          <mesh position={[0, 0, -0.01]}>
+            <planeGeometry args={[0.6, 0.1]} />
+            <meshBasicMaterial color="#333" />
+          </mesh>
+          {/* Foreground (HP bar) */}
+          <mesh position={[( (piece.hp / piece.maxHp) - 1 ) * 0.3, 0, 0]}>
+            <planeGeometry args={[Math.max(0.01, 0.6 * (piece.hp / piece.maxHp)), 0.1]} />
+            <meshBasicMaterial color={piece.hp / piece.maxHp > 0.5 ? "#4caf50" : piece.hp / piece.maxHp > 0.2 ? "#ffeb3b" : "#f44336"} />
+          </mesh>
+          {/* HP Text with Contour (Outline) */}
+          <Text 
+            position={[0, 0, 0.05]} 
+            fontSize={0.12} 
+            color="white" 
+            outlineWidth={0.015} 
+            outlineColor="black"
+            fontWeight="bold"
+          >
+            {Math.ceil(piece.hp)} / {piece.maxHp}
+          </Text>
+        </group>
+      </Billboard>
       
       {/* Floating stats indicator - raised to clear all piece heights */}
       {(piece.kills > 0 || piece.defends > 0) && (
-        <Billboard position={[0, 2.0, 0]} follow={true}>
+        <Billboard position={[0, 2.3, 0]} follow={true}>
           {piece.kills > 0 && (
             <Text position={[0, 0.2, 0]} fontSize={0.25} color="#ff8a80" outlineWidth={0.02} outlineColor="black">
               ⚔️{piece.kills}

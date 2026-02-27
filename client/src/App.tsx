@@ -11,7 +11,7 @@ import { CombatEffect } from './components/CombatEffect';
 import { Scenery } from './components/Scenery';
 
 function App() {
-  const { pieces, turn, selectedPieceId, battleResult, isRolling, isPaused, winner, isNight, setIsNight, setIsPaused, resetGame, handleSquareClick } = useChessGame();
+  const { pieces, turn, selectedPieceId, battleResult, isRolling, isPaused, winner, isNight, hasStarted, setHasStarted, setIsNight, setIsPaused, resetGame, handleSquareClick } = useChessGame();
 
   const selectedPiece = useMemo(() => 
     pieces.find(p => p.id === selectedPieceId) || null,
@@ -81,7 +81,7 @@ function App() {
           maxPolarAngle={Math.PI / 2.2} 
           minDistance={5} 
           maxDistance={35} 
-          enabled={!isPaused} // Disable camera rotation when paused
+          enabled={!isPaused && hasStarted} // Disable camera rotation when paused or not started
         />
       </Canvas>
 
@@ -94,6 +94,8 @@ function App() {
         isPaused={isPaused}
         winner={winner}
         isNight={isNight}
+        hasStarted={hasStarted}
+        setHasStarted={setHasStarted}
         setIsNight={setIsNight}
         setIsPaused={setIsPaused}
         resetGame={resetGame}

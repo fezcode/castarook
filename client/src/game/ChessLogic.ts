@@ -3,10 +3,25 @@ import type { Piece, PieceType, PlayerColor, Position } from '../types';
 export const setupBoard = (): Piece[] => {
   const pieces: Piece[] = [];
   
-  const createPiece = (type: PieceType, color: PlayerColor, x: number, y: number): Piece => ({
-    id: `${type}-${color}-${x}-${y}-${Math.random().toString(36).substr(2, 9)}`,
-    type, color, x, y, kills: 0, defends: 0
-  });
+  const getInitialHp = (type: PieceType): number => {
+    switch (type) {
+      case 'pawn': return 10;
+      case 'knight': return 20;
+      case 'bishop': return 20;
+      case 'rook': return 30;
+      case 'queen': return 40;
+      case 'king': return 50;
+      default: return 10;
+    }
+  };
+
+  const createPiece = (type: PieceType, color: PlayerColor, x: number, y: number): Piece => {
+    const hp = getInitialHp(type);
+    return {
+      id: `${type}-${color}-${x}-${y}-${Math.random().toString(36).substr(2, 9)}`,
+      type, color, x, y, kills: 0, defends: 0, hp, maxHp: hp
+    };
+  };
 
   // Pawns
   for (let x = 0; x < 8; x++) {

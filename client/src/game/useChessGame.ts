@@ -11,6 +11,7 @@ export const useChessGame = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [winner, setWinner] = useState<'white' | 'black' | null>(null);
   const [isNight, setIsNight] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
   const resetGame = () => {
     setPieces(setupBoard());
@@ -20,12 +21,13 @@ export const useChessGame = () => {
     setIsRolling(false);
     setIsPaused(false);
     setWinner(null);
+    setHasStarted(true); // Don't show start screen again on reset
   };
 
   const getPieceAt = (x: number, y: number) => pieces.find(p => p.x === x && p.y === y);
 
   const handleSquareClick = (x: number, y: number) => {
-    if (isRolling || isPaused || winner) return; // Block input during dice roll, pause, or game over
+    if (isRolling || isPaused || winner || !hasStarted) return; // Block input during dice roll, pause, game over, or if not started
 
     // Clear battle result on next action if it's already shown
     if (battleResult && !isRolling) setBattleResult(null);
@@ -47,6 +49,7 @@ export const useChessGame = () => {
           const defenderTotal = defenderRoll + clickedPiece.defends;
           
           const success = attackerTotal > defenderTotal;
+          const damage = Math.abs(attackerTotal - defenderTotal);
           
           setIsRolling(true);
           setBattleResult({ 
@@ -60,28 +63,45 @@ export const useChessGame = () => {
             setIsRolling(false);
             if (success) {
               // Attacker wins
-              if (clickedPiece.type === 'king') {
-                setWinner(selectedPiece.color);
+              const newHp = clickedPiece.hp - damage;
+              const defenderKilled = newHp <= 0;
+              
+              if (defenderKilled) {
+                if (clickedPiece.type === 'king') setWinner(selectedPiece.color);
+                setPieces(prev => prev.map(p => {
+                  if (p.id === selectedPiece.id) return { ...p, x, y, kills: p.kills + 1 };
+                  return p;
+                }).filter(p => p.id !== clickedPiece.id));
+              } else {
+                setPieces(prev => prev.map(p => {
+                  if (p.id === clickedPiece.id) return { ...p, hp: newHp };
+                  return p;
+                }));
               }
-              setPieces(prev => prev.map(p => {
-                if (p.id === selectedPiece.id) return { ...p, x, y, kills: p.kills + 1 };
-                return p;
-              }).filter(p => p.id !== clickedPiece.id));
             } else {
-              // Defender wins, attacker is destroyed
-              if (selectedPiece.type === 'king') {
-                 setWinner(clickedPiece.color);
+              // Defender wins (or draw)
+              const newHp = selectedPiece.hp - (damage === 0 ? 1 : damage); // Draw deals 1 damage to attacker
+              const attackerKilled = newHp <= 0;
+              
+              if (attackerKilled) {
+                if (selectedPiece.type === 'king') setWinner(clickedPiece.color);
+                setPieces(prev => prev.map(p => {
+                  if (p.id === clickedPiece.id) return { ...p, defends: p.defends + 1 };
+                  return p;
+                }).filter(p => p.id !== selectedPiece.id));
+              } else {
+                setPieces(prev => prev.map(p => {
+                  if (p.id === selectedPiece.id) return { ...p, hp: newHp };
+                  if (p.id === clickedPiece.id) return { ...p, defends: p.defends + 1 }; // Integer bonus for survival
+                  return p;
+                }));
               }
-              setPieces(prev => prev.map(p => {
-                if (p.id === clickedPiece.id) return { ...p, defends: p.defends + 1 };
-                return p;
-              }).filter(p => p.id !== selectedPiece.id));
             }
-            if (clickedPiece.type !== 'king' && selectedPiece.type !== 'king' || (!success && selectedPiece.type !== 'king') || (success && clickedPiece.type !== 'king')) {
-                setTurn(turn === 'white' ? 'black' : 'white');
-            }
+            
+            // Turn always ends after an attack
+            setTurn(turn === 'white' ? 'black' : 'white');
             setSelectedPieceId(null);
-          }, 2000); // Show rolling animation for 2 seconds
+          }, 2000); 
 
           return;
         } else if (!clickedPiece) {
@@ -114,6 +134,8 @@ export const useChessGame = () => {
     isPaused,
     winner,
     isNight,
+    hasStarted,
+    setHasStarted,
     setIsNight,
     setIsPaused,
     resetGame,
