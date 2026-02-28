@@ -139,7 +139,7 @@ export const GameUI: React.FC<Props> = ({
             <h1 style={{ color: '#fff', fontSize: '100px', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '12px', fontWeight: 'bold', textShadow: '0 0 20px rgba(212, 175, 55, 0.5), 2px 2px 0px #000' }}>
               RPG<span style={{ color: '#d4af37' }}>CHESS</span>
             </h1>
-            <div style={{ color: '#aaa', fontSize: '14px', marginBottom: '30px', letterSpacing: '2px' }}>v{packageJson.version}</div>
+            <div style={{ color: '#d4af37', fontSize: '16px', fontWeight: 'bold', marginBottom: '30px', letterSpacing: '3px', textShadow: '1px 1px 0px #000' }}>v{packageJson.version}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '320px', margin: '0 auto' }}>
               <button onClick={() => { setIsVsAI(false); setHasStarted(true); }} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', border: '2px solid #fff', fontSize: '20px', fontWeight: 'bold', padding: '15px' }}>Player vs Player</button>
               
