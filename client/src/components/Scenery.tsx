@@ -6,7 +6,7 @@ import * as THREE from 'three';
 const getTerrainHeight = (x: number, z: number) => {
   const distFromCenter = Math.sqrt(x*x + z*z);
   let y = 0;
-  if (distFromCenter > 8) {
+  if (distFromCenter > 15) {
     y = (Math.sin(x * 0.1) * Math.cos(z * 0.1) * 2) + (Math.sin(x * 0.05) * 1.5);
     const riverCenter = 30 + Math.sin(z * 0.05) * 15;
     const distToRiver = Math.abs(x - riverCenter);
@@ -331,6 +331,80 @@ const WindParticles = () => {
   );
 };
 
+const StonePlaza = ({ isNight }: { isNight: boolean }) => {
+  const plazaColor = isNight ? "#1a1a1a" : "#4a4a4a";
+  const rimColor = isNight ? "#111" : "#333";
+  
+  return (
+    <group position={[0, -0.55, 0]}>
+      {/* Foundation - Tiered stone slabs - Deep foundation to prevent floating */}
+      <mesh position={[0, -0.5, 0]} receiveShadow>
+        <cylinderGeometry args={[12, 13, 1.2, 32]} />
+        <meshStandardMaterial color={plazaColor} roughness={0.9} />
+      </mesh>
+      
+      {/* Main Elevated Plaza */}
+      <mesh position={[0, 0.15, 0]} receiveShadow>
+        <cylinderGeometry args={[10.5, 11, 0.2, 32]} />
+        <meshStandardMaterial color={plazaColor} roughness={0.8} />
+      </mesh>
+
+      {/* Decorative Rim */}
+      <mesh position={[0, 0.15, 0]} receiveShadow rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[11, 0.1, 8, 48]} />
+        <meshStandardMaterial color={rimColor} metalness={0.2} roughness={0.6} />
+      </mesh>
+
+      {/* Corner Pillars/Stones */}
+      {[0, Math.PI/2, Math.PI, Math.PI*1.5].map((angle, i) => (
+        <group key={i} position={[Math.cos(angle) * 11.5, 0.3, Math.sin(angle) * 11.5]} rotation={[0, -angle, 0]}>
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[1.5, 0.8, 1.5]} />
+            <meshStandardMaterial color={plazaColor} roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0.5, 0]} castShadow>
+            <sphereGeometry args={[0.3, 8, 8]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.8} roughness={0.2} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* Decorative Stone Tiles/Slabs scattered around */}
+      {Array.from({ length: 16 }).map((_, i) => {
+        const angle = (i / 16) * Math.PI * 2 + Math.random() * 0.2;
+        const dist = 13.5 + Math.random() * 2.5;
+        const scale = 0.5 + Math.random() * 1.5;
+        return (
+          <mesh 
+            key={`slab-${i}`} 
+            position={[Math.cos(angle) * dist, getTerrainHeight(Math.cos(angle) * dist, Math.sin(angle) * dist) + 0.6, Math.sin(angle) * dist]} 
+            rotation={[-Math.PI / 2, 0, angle]}
+            scale={[scale, scale, 1]}
+            receiveShadow
+          >
+            <boxGeometry args={[1, 1, 0.1]} />
+            <meshStandardMaterial color={plazaColor} roughness={0.9} />
+          </mesh>
+        );
+      })}
+
+      {/* Steps leading up to the board area */}
+      {[0, Math.PI].map((angle, i) => (
+        <group key={`steps-${i}`} rotation={[0, angle + Math.PI/2, 0]}>
+          <mesh position={[0, 0.05, 11.5]} receiveShadow>
+            <boxGeometry args={[4, 0.1, 2]} />
+            <meshStandardMaterial color={plazaColor} />
+          </mesh>
+          <mesh position={[0, -0.05, 13]} receiveShadow>
+            <boxGeometry args={[5, 0.1, 2]} />
+            <meshStandardMaterial color={plazaColor} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+};
+
 export const Scenery = ({ isNight, windStrength = 1.0 }: { isNight: boolean, windStrength?: number }) => {
   const trees = useMemo(() => {
     const list = [];
@@ -398,7 +472,7 @@ export const Scenery = ({ isNight, windStrength = 1.0 }: { isNight: boolean, win
       <Terrain isNight={isNight} />
       <River windStrength={windStrength} />
 
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.54, 0]} receiveShadow><circleGeometry args={[12, 32]} /><meshStandardMaterial color="#3d2b1f" roughness={0.9} /></mesh>
+      <StonePlaza isNight={isNight} />
 
       {mountains.map((m, i) => <Mountain key={`mtn-${i}`} position={m.pos} scale={m.scale} color={m.color} />)}
 
