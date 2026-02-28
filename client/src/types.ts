@@ -25,9 +25,11 @@ export interface BattleResult {
   attackerRoll: number;
   attackerTotal: number;
   attackerStats: number;
+  attackerDice: number;
   defenderRoll: number;
   defenderTotal: number;
   defenderStats: number;
+  defenderDice: number;
   success: boolean;
   targetX: number;
   targetY: number;

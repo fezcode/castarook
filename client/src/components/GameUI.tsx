@@ -27,6 +27,7 @@ interface Props {
   setIsNight: (night: boolean) => void;
   setIsPaused: (paused: boolean) => void;
   resetGame: () => void;
+  setBattleResult: (result: BattleResult | null) => void;
 }
 
 export const GameUI: React.FC<Props> = ({ 
@@ -35,7 +36,7 @@ export const GameUI: React.FC<Props> = ({
   boardStyle, windStrength, whiteColor, blackColor,
   setBoardStyle, setWindStrength, setWhiteColor, setBlackColor,
   setFogNear, setFogFar,
-  setHasStarted, setIsNight, setIsPaused, resetGame 
+  setHasStarted, setIsNight, setIsPaused, resetGame, setBattleResult 
 }) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
 
@@ -216,8 +217,8 @@ export const GameUI: React.FC<Props> = ({
             <div style={{ textAlign: 'left', lineHeight: '1.8', fontSize: '18px' }}>
               <p>Command your pieces across the valley. Unlike regular chess, combat is determined by the fate of the dice.</p>
               <ul style={{ listStyleType: 'square' }}>
-                <li><strong>Skirmishes:</strong> Both units roll a D20. Totals include their battle-hardened stats.</li>
-                <li><strong>Valor & Health:</strong> Damage is dealt based on the roll difference. Units perish only at 0 HP.</li>
+                <li><strong>Skirmishes:</strong> Every unit has a unique die (Pawn: D6, Knight: D10, Bishop: D12, Rook: D15, Queen: D18, King: D20).</li>
+                <li><strong>Valor & Health:</strong> Totals include battle-hardened stats (max +5). Damage is dealt based on the roll difference. Units perish only at 0 HP.</li>
                 <li><strong>Advanced Maneuvers:</strong>
                   <ul style={{ color: '#d4af37' }}>
                     <li>Promotion: Reach the end to crown a Queen.</li>
@@ -372,15 +373,28 @@ export const GameUI: React.FC<Props> = ({
           </h1>
           <div style={{ marginBottom: '25px', padding: '20px', background: 'rgba(0,0,0,0.5)', borderRadius: '8px', border: '1px solid #d4af37' }}>
             <div style={{ fontSize: '22px', marginBottom: '12px', color: '#d4af37' }}>
-              Attacker: {battleResult.attackerRoll} + {battleResult.attackerStats} = <strong>{battleResult.attackerTotal}</strong>
+              Attacker (D{battleResult.attackerDice}): {battleResult.attackerRoll} + {battleResult.attackerStats} = <strong>{battleResult.attackerTotal}</strong>
             </div>
             <div style={{ fontSize: '22px', color: '#f0d9b5' }}>
-              Defender: {battleResult.defenderRoll} + {battleResult.defenderStats} = <strong>{battleResult.defenderTotal}</strong>
+              Defender (D{battleResult.defenderDice}): {battleResult.defenderRoll} + {battleResult.defenderStats} = <strong>{battleResult.defenderTotal}</strong>
             </div>
           </div>
-          <h2 style={{ fontSize: '24px', margin: 0, opacity: 0.9, fontStyle: 'italic' }}>
+          <h2 style={{ fontSize: '24px', margin: '0 0 25px 0', opacity: 0.9, fontStyle: 'italic' }}>
             {battleResult.success ? 'The objective is secured!' : 'The onslaught was resisted!'}
           </h2>
+          <button 
+            onClick={() => setBattleResult(null)}
+            style={{ 
+              ...menuButtonStyle, 
+              width: '180px', 
+              margin: '0 auto', 
+              background: 'rgba(212, 175, 55, 0.2)', 
+              fontSize: '16px',
+              padding: '10px'
+            }}
+          >
+            Continue Saga
+          </button>
         </div>
       )}
 
@@ -394,10 +408,19 @@ export const GameUI: React.FC<Props> = ({
             </h3>
             <div style={{ fontSize: '18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '24px' }}>⚔️</span> <span>Veteran Kills: <strong>{selectedPiece.kills}</strong></span>
+                <span style={{ fontSize: '24px' }}>🎲</span> <span>Dice: <strong>D{
+                  selectedPiece.type === 'pawn' ? 6 :
+                  selectedPiece.type === 'knight' ? 10 :
+                  selectedPiece.type === 'bishop' ? 12 :
+                  selectedPiece.type === 'rook' ? 15 :
+                  selectedPiece.type === 'queen' ? 18 : 20
+                }</strong></span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '24px' }}>🛡️</span> <span>Walls Defended: <strong>{selectedPiece.defends}</strong></span>
+                <span style={{ fontSize: '24px' }}>⚔️</span> <span>Veteran Kills: <strong>{selectedPiece.kills}</strong> {selectedPiece.kills >= 5 && <small style={{ color: '#4caf50', fontSize: '12px' }}>(MAX)</small>}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '24px' }}>🛡️</span> <span>Walls Defended: <strong>{selectedPiece.defends}</strong> {selectedPiece.defends >= 5 && <small style={{ color: '#4caf50', fontSize: '12px' }}>(MAX)</small>}</span>
               </div>
             </div>
           </div>

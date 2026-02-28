@@ -129,5 +129,20 @@ export const getValidMoves = (piece: Piece, pieces: Piece[]): Position[] => {
   return moves;
 };
 
-// D20 dice roll
-export const rollDice = () => Math.floor(Math.random() * 20) + 1;
+export const getDiceSides = (type: PieceType): number => {
+  switch (type) {
+    case 'pawn': return 6;
+    case 'knight': return 10;
+    case 'bishop': return 12;
+    case 'rook': return 15;
+    case 'queen': return 18;
+    case 'king': return 20;
+    default: return 20;
+  }
+};
+
+// Piece-specific dice rolls
+export const rollDice = (type: PieceType) => {
+  const sides = getDiceSides(type);
+  return Math.floor(Math.random() * sides) + 1;
+};

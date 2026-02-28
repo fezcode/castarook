@@ -17,7 +17,7 @@ function App() {
     boardStyle, windStrength, whiteColor, blackColor,
     setBoardStyle, setWindStrength, setWhiteColor, setBlackColor,
     setHasStarted, setIsNight, setIsPaused, setFogNear, setFogFar,
-    resetGame, handleSquareClick 
+    resetGame, handleSquareClick, setBattleResult 
   } = useChessGame();
 
   const selectedPiece = useMemo(() => 
@@ -83,8 +83,10 @@ function App() {
            <DiceRoll 
              attackerRoll={battleResult.attackerRoll} 
              attackerStats={battleResult.attackerStats}
+             attackerDice={battleResult.attackerDice}
              defenderRoll={battleResult.defenderRoll} 
              defenderStats={battleResult.defenderStats}
+             defenderDice={battleResult.defenderDice}
              isRolling={isRolling} 
            />
         )}
@@ -124,6 +126,7 @@ function App() {
         setIsNight={setIsNight}
         setIsPaused={setIsPaused}
         resetGame={resetGame}
+        setBattleResult={setBattleResult}
       />
     </div>
   );

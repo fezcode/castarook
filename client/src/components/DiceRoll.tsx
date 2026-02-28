@@ -6,12 +6,18 @@ import * as THREE from 'three';
 interface Props {
   attackerRoll: number;
   attackerStats: number;
+  attackerDice: number;
   defenderRoll: number;
   defenderStats: number;
+  defenderDice: number;
   isRolling: boolean;
 }
 
-export const DiceRoll: React.FC<Props> = ({ attackerRoll, attackerStats, defenderRoll, defenderStats, isRolling }) => {
+export const DiceRoll: React.FC<Props> = ({ 
+  attackerRoll, attackerStats, attackerDice,
+  defenderRoll, defenderStats, defenderDice, 
+  isRolling 
+}) => {
   const attackerGroupRef = useRef<THREE.Group>(null);
   const defenderGroupRef = useRef<THREE.Group>(null);
   
@@ -70,6 +76,9 @@ export const DiceRoll: React.FC<Props> = ({ attackerRoll, attackerStats, defende
         </group>
         {/* The Billboard Text */}
         <Billboard follow={true}>
+          <Text position={[0, 1.2, 0]} fontSize={0.4} color="white" outlineWidth={0.05} outlineColor="black">
+            D{attackerDice}
+          </Text>
           <Text position={[0, 0, 1.1]} fontSize={0.6} color="white" anchorX="center" anchorY="middle">
             {displayAttacker}
           </Text>
@@ -100,6 +109,9 @@ export const DiceRoll: React.FC<Props> = ({ attackerRoll, attackerStats, defende
         </group>
         {/* The Billboard Text */}
         <Billboard follow={true}>
+          <Text position={[0, 1.2, 0]} fontSize={0.4} color="white" outlineWidth={0.05} outlineColor="black">
+            D{defenderDice}
+          </Text>
           <Text position={[0, 0, 1.1]} fontSize={0.6} color="white" anchorX="center" anchorY="middle">
             {displayDefender}
           </Text>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Piece, BattleResult, LogEntry } from '../types';
-import { setupBoard, getValidMoves, rollDice } from './ChessLogic';
+import { setupBoard, getValidMoves, rollDice, getDiceSides } from './ChessLogic';
 
 export const useChessGame = () => {
   const [pieces, setPieces] = useState<Piece[]>(setupBoard());
@@ -62,18 +62,20 @@ export const useChessGame = () => {
       if (isValidMove) {
         if (clickedPiece && clickedPiece.color !== selectedPiece.color) {
           // RPG Battle Phase!
-          const attackerRoll = rollDice();
-          const defenderRoll = rollDice();
-          const attackerTotal = attackerRoll + selectedPiece.kills;
-          const defenderTotal = defenderRoll + clickedPiece.defends;
+          const attackerRoll = rollDice(selectedPiece.type);
+          const defenderRoll = rollDice(clickedPiece.type);
+          const attackerTotal = attackerRoll + Math.min(selectedPiece.kills, 5);
+          const defenderTotal = defenderRoll + Math.min(clickedPiece.defends, 5);
           
           const success = attackerTotal > defenderTotal;
           const damage = Math.abs(attackerTotal - defenderTotal);
           
           setIsRolling(true);
           setBattleResult({ 
-            attackerRoll, attackerTotal, attackerStats: selectedPiece.kills,
-            defenderRoll, defenderTotal, defenderStats: clickedPiece.defends,
+            attackerRoll, attackerTotal, attackerStats: Math.min(selectedPiece.kills, 5),
+            attackerDice: getDiceSides(selectedPiece.type),
+            defenderRoll, defenderTotal, defenderStats: Math.min(clickedPiece.defends, 5),
+            defenderDice: getDiceSides(clickedPiece.type),
             success,
             targetX: x, targetY: y
           });
@@ -117,7 +119,7 @@ export const useChessGame = () => {
                         maxHp = 40;
                         hp = 40;
                       }
-                      return { ...p, x, y, type, hp, maxHp, kills: p.kills + 1, hasMoved: true, status: 'idle' as const };
+                      return { ...p, x, y, type, hp, maxHp, kills: Math.min(p.kills + 1, 5), hasMoved: true, status: 'idle' as const };
                     }
                     return p;
                   }).filter(p => p.id !== clickedPiece.id));
@@ -152,7 +154,7 @@ export const useChessGame = () => {
 
                 setTimeout(() => {
                   setPieces(prev => prev.map(p => {
-                    if (p.id === clickedPiece.id) return { ...p, defends: p.defends + 1, status: 'idle' as const };
+                    if (p.id === clickedPiece.id) return { ...p, defends: Math.min(p.defends + 1, 5), status: 'idle' as const };
                     return p;
                   }).filter(p => p.id !== selectedPiece.id));
                 }, 1000);
@@ -161,7 +163,7 @@ export const useChessGame = () => {
                 addLog(`${clickedPiece.color} ${clickedPiece.type} repelled attack (${damage === 0 ? 1 : damage} dmg to attacker)`, 'attack');
                 setPieces(prev => prev.map(p => {
                   if (p.id === selectedPiece.id) return { ...p, hp: newHp, hasMoved: true };
-                  if (p.id === clickedPiece.id) return { ...p, defends: p.defends + 1 }; // Integer bonus for survival
+                  if (p.id === clickedPiece.id) return { ...p, defends: Math.min(p.defends + 1, 5) }; // Integer bonus for survival
                   return p;
                 }));
               }
@@ -264,6 +266,7 @@ export const useChessGame = () => {
     setIsNight,
     setIsPaused,
     resetGame,
-    handleSquareClick
+    handleSquareClick,
+    setBattleResult
   };
 };
