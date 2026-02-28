@@ -399,6 +399,18 @@ const StonePlaza = ({ isNight }: { isNight: boolean }) => {
     polygonOffsetFactor: -1,
     polygonOffsetUnits: -1,
   };
+
+  const scatteredStones = useMemo(() => {
+    return Array.from({ length: 16 }).map((_, i) => {
+      const angle = (i / 16) * Math.PI * 2 + Math.random() * 0.2;
+      const dist = 13.5 + Math.random() * 2.5;
+      const scale = 0.5 + Math.random() * 1.5;
+      const x = Math.cos(angle) * dist;
+      const z = Math.sin(angle) * dist;
+      const y = getTerrainHeight(x, z) + 0.75;
+      return { id: i, position: [x, y, z] as [number, number, number], rotation: [-Math.PI / 2, 0, angle] as [number, number, number], scale: [scale, scale, 1.5] as [number, number, number] };
+    });
+  }, []);
   
   return (
     <group position={[0, -0.55, 0]}>
@@ -435,24 +447,18 @@ const StonePlaza = ({ isNight }: { isNight: boolean }) => {
       ))}
 
       {/* Decorative Stone Tiles/Slabs scattered around */}
-      {Array.from({ length: 16 }).map((_, i) => {
-        const angle = (i / 16) * Math.PI * 2 + Math.random() * 0.2;
-        const dist = 13.5 + Math.random() * 2.5;
-        const scale = 0.5 + Math.random() * 1.5;
-        // Lifted more (+0.75) and slightly thickened to avoid any z-fighting with the grass
-        return (
-          <mesh 
-            key={`slab-${i}`} 
-            position={[Math.cos(angle) * dist, getTerrainHeight(Math.cos(angle) * dist, Math.sin(angle) * dist) + 0.75, Math.sin(angle) * dist]} 
-            rotation={[-Math.PI / 2, 0, angle]}
-            scale={[scale, scale, 1.5]}
-            receiveShadow
-          >
-            <boxGeometry args={[1, 1, 0.1]} />
-            <meshStandardMaterial color={plazaColor} roughness={0.9} {...stoneMaterialProps} />
-          </mesh>
-        );
-      })}
+      {scatteredStones.map(stone => (
+        <mesh 
+          key={`slab-${stone.id}`} 
+          position={stone.position} 
+          rotation={stone.rotation}
+          scale={stone.scale}
+          receiveShadow
+        >
+          <boxGeometry args={[1, 1, 0.1]} />
+          <meshStandardMaterial color={plazaColor} roughness={0.9} {...stoneMaterialProps} />
+        </mesh>
+      ))}
 
       {/* Steps leading up to the board area */}
       {[0, Math.PI].map((angle, i) => (
