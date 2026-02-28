@@ -43,6 +43,7 @@ export const GameUI: React.FC<Props> = ({
   isVsAI, setIsVsAI
 }) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
+  const [isCreditsOpen, setIsCreditsOpen] = React.useState(false);
   const [showAIWarning, setShowAIWarning] = React.useState(false);
 
   const getLogColor = (type: LogEntry['type']) => {
@@ -150,6 +151,7 @@ export const GameUI: React.FC<Props> = ({
               </div>
 
               <button onClick={() => setIsTutorialOpen(true)} style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#d4af37' }}>Learn the Rules</button>
+              <button onClick={() => setIsCreditsOpen(true)} style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#d4af37' }}>Credits</button>
             </div>
             <div style={{ width: '200px', height: '1px', background: 'rgba(212, 175, 55, 0.3)', margin: '40px auto 20px auto' }}></div>
             <button 
@@ -287,6 +289,49 @@ export const GameUI: React.FC<Props> = ({
             </div>
             <button onClick={() => setIsTutorialOpen(false)} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', marginTop: '30px', fontWeight: 'bold' }}>
               Back to the Front
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Credits Overlay */}
+      {isCreditsOpen && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          pointerEvents: 'auto',
+          zIndex: 50
+        }}>
+          <div style={{ ...aoeBoxStyle, padding: '40px', borderRadius: '8px', minWidth: '400px', textAlign: 'center', border: '4px double #d4af37' }}>
+            <h1 style={{ color: '#d4af37', marginTop: 0, fontSize: '36px', textTransform: 'uppercase' }}>Architects of the Saga</h1>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', margin: '30px 0' }}>
+              <div 
+                onClick={() => window.open('https://fezcode.com', '_blank')}
+                style={{ fontSize: '24px', cursor: 'pointer', color: '#f0d9b5', transition: 'color 0.2s' }}
+                onMouseOver={(e) => e.currentTarget.style.color = '#d4af37'}
+                onMouseOut={(e) => e.currentTarget.style.color = '#f0d9b5'}
+              >
+                Samil Bulbul (@fezcode)
+              </div>
+              <div 
+                onClick={() => window.open('https://github.com/TheLastRoadRunner', '_blank')}
+                style={{ fontSize: '24px', cursor: 'pointer', color: '#f0d9b5', transition: 'color 0.2s' }}
+                onMouseOver={(e) => e.currentTarget.style.color = '#d4af37'}
+                onMouseOut={(e) => e.currentTarget.style.color = '#f0d9b5'}
+              >
+                Sabri Bulbul (@thelastroadrunner)
+              </div>
+            </div>
+            <button onClick={() => setIsCreditsOpen(false)} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', marginTop: '10px', fontWeight: 'bold' }}>
+              Return to Menu
             </button>
           </div>
         </div>
