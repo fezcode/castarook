@@ -13,6 +13,7 @@ export interface Piece {
   hp: number;
   maxHp: number;
   hasMoved: boolean;
+  isDebuffed?: boolean; // -2 Defense debuff after moving
   status: 'idle' | 'attacking' | 'dying';
 }
 
@@ -30,6 +31,7 @@ export interface BattleResult {
   defenderTotal: number;
   defenderStats: number;
   defenderDice: number;
+  defenderDebuff: number;
   success: boolean;
   targetX: number;
   targetY: number;

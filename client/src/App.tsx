@@ -130,6 +130,7 @@ function App() {
              defenderRoll={battleResult.defenderRoll} 
              defenderStats={battleResult.defenderStats}
              defenderDice={battleResult.defenderDice}
+             defenderDebuff={battleResult.defenderDebuff}
              isRolling={isRolling} 
            />
         )}

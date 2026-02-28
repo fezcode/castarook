@@ -54,7 +54,7 @@ export const calculateBestMove = (pieces: Piece[], color: PlayerColor): Move | n
         
         // Very basic expectation: Average roll + stats
         const expectedAttackerTotal = (attackerDice / 2) + piece.kills;
-        const expectedDefenderTotal = (defenderDice / 2) + targetPiece.defends;
+        const expectedDefenderTotal = (defenderDice / 2) + targetPiece.defends - (targetPiece.isDebuffed ? 2 : 0);
         
         if (expectedAttackerTotal > expectedDefenderTotal) {
           // We are likely to win this skirmish

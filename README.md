@@ -17,7 +17,8 @@ When one piece attacks another, combat is determined by the fate of the dice.
     *   **King:** D20
 *   **Veteran Attributes (Max +5):** 
     *   **Attacker Total:** `Die Roll + Veteran Kills`
-    *   **Defender Total:** `Die Roll + Walls Defended`
+    *   **Defender Total:** `Die Roll + Walls Defended - Penalty`
+*   **Opportunity Attack (Vulnerability):** Any unit that has just moved becomes **Vulnerable (-2 Defense)** until the start of its next turn. This rewards aggressive counter-play.
 *   **Damage Calculation:** The difference between the two totals is dealt as damage to the loser's health.
 *   **Health Points (HP):**
     *   **Pawn:** 10 HP

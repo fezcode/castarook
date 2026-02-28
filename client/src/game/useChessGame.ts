@@ -47,11 +47,18 @@ export const useChessGame = () => {
 
   const getPieceAt = (x: number, y: number) => pieces.find(p => p.x === x && p.y === y);
 
-  const handleSquareClick = (x: number, y: number) => {
+  const nextTurn = (currentTurn: 'white' | 'black') => {
+    const nextPlayer = currentTurn === 'white' ? 'black' : 'white';
+    setTurn(nextPlayer);
+    // Clear debuffs for the player who is about to start their turn
+    setPieces(prev => prev.map(p => p.color === nextPlayer ? { ...p, isDebuffed: false } : p));
+  };
+
+  const handleSquareClick = (x: number, y: number, isAiCall: boolean = false) => {
     if (isRolling || isPaused || winner || !hasStarted) return; // Block input during dice roll, pause, game over, or if not started
     
-    // Block input if it's the AI's turn
-    if (isVsAI && turn === 'black' && !aiMoveSequence) return;
+    // Block HUMAN input if it's the AI's turn
+    if (isVsAI && turn === 'black' && !isAiCall) return;
 
     // Clear battle result on next action if it's already shown
     if (battleResult && !isRolling) setBattleResult(null);
@@ -70,7 +77,10 @@ export const useChessGame = () => {
           const attackerRoll = rollDice(selectedPiece.type);
           const defenderRoll = rollDice(clickedPiece.type);
           const attackerTotal = attackerRoll + Math.min(selectedPiece.kills, 5);
-          const defenderTotal = defenderRoll + Math.min(clickedPiece.defends, 5);
+          
+          // Apply -2 defense penalty if defender is debuffed
+          const defPenalty = clickedPiece.isDebuffed ? 2 : 0;
+          const defenderTotal = defenderRoll + Math.min(clickedPiece.defends, 5) - defPenalty;
           
           const success = attackerTotal > defenderTotal;
           const damage = Math.abs(attackerTotal - defenderTotal);
@@ -81,6 +91,7 @@ export const useChessGame = () => {
             attackerDice: getDiceSides(selectedPiece.type),
             defenderRoll, defenderTotal, defenderStats: Math.min(clickedPiece.defends, 5),
             defenderDice: getDiceSides(clickedPiece.type),
+            defenderDebuff: defPenalty,
             success,
             targetX: x, targetY: y
           });
@@ -124,7 +135,7 @@ export const useChessGame = () => {
                         maxHp = 40;
                         hp = 40;
                       }
-                      return { ...p, x, y, type, hp, maxHp, kills: Math.min(p.kills + 1, 5), hasMoved: true, status: 'idle' as const };
+                      return { ...p, x, y, type, hp, maxHp, kills: Math.min(p.kills + 1, 5), hasMoved: true, isDebuffed: true, status: 'idle' as const };
                     }
                     return p;
                   }).filter(p => p.id !== clickedPiece.id));
@@ -134,7 +145,7 @@ export const useChessGame = () => {
                 addLog(`${selectedPiece.color} ${selectedPiece.type} dealt ${damage} dmg to ${clickedPiece.color} ${clickedPiece.type}`, 'attack');
                 setPieces(prev => prev.map(p => {
                   if (p.id === clickedPiece.id) return { ...p, hp: newHp };
-                  if (p.id === selectedPiece.id) return { ...p, hasMoved: true };
+                  if (p.id === selectedPiece.id) return { ...p, hasMoved: true, isDebuffed: true };
                   return p;
                 }));
               }
@@ -167,7 +178,7 @@ export const useChessGame = () => {
               } else {
                 addLog(`${clickedPiece.color} ${clickedPiece.type} repelled attack (${damage === 0 ? 1 : damage} dmg to attacker)`, 'attack');
                 setPieces(prev => prev.map(p => {
-                  if (p.id === selectedPiece.id) return { ...p, hp: newHp, hasMoved: true };
+                  if (p.id === selectedPiece.id) return { ...p, hp: newHp, hasMoved: true, isDebuffed: true };
                   if (p.id === clickedPiece.id) return { ...p, defends: Math.min(p.defends + 1, 5) }; // Integer bonus for survival
                   return p;
                 }));
@@ -175,7 +186,7 @@ export const useChessGame = () => {
             }
             
             // Turn always ends after an attack
-            setTurn(turn === 'white' ? 'black' : 'white');
+            nextTurn(turn);
             setSelectedPieceId(null);
           }, 2000); 
 
@@ -208,7 +219,7 @@ export const useChessGame = () => {
                   maxHp = 40;
                   hp = 40;
                 }
-                return { ...p, x, y, type, hp, maxHp, hasMoved: true };
+                return { ...p, x, y, type, hp, maxHp, hasMoved: true, isDebuffed: true };
               }
               return p;
             });
@@ -221,7 +232,7 @@ export const useChessGame = () => {
               const newRookX = isKingside ? 5 : 3;
               nextPieces = nextPieces.map(p => {
                 if (p.type === 'rook' && p.color === selectedPiece.color && p.x === rookX && p.y === row) {
-                  return { ...p, x: newRookX, hasMoved: true };
+                  return { ...p, x: newRookX, hasMoved: true, isDebuffed: true };
                 }
                 return p;
               });
@@ -229,7 +240,7 @@ export const useChessGame = () => {
 
             return nextPieces;
           });
-          setTurn(turn === 'white' ? 'black' : 'white');
+          nextTurn(turn);
           setSelectedPieceId(null);
           return;
         }
@@ -262,13 +273,13 @@ export const useChessGame = () => {
     if (aiMoveSequence && !isPaused && !winner) {
       if (aiMoveSequence.step === 1) {
         const timer = setTimeout(() => {
-          handleSquareClick(aiMoveSequence.move.startX, aiMoveSequence.move.startY);
+          handleSquareClick(aiMoveSequence.move.startX, aiMoveSequence.move.startY, true);
           setAiMoveSequence(prev => prev ? { ...prev, step: 2 } : null);
         }, 300);
         return () => clearTimeout(timer);
       } else if (aiMoveSequence.step === 2) {
         const timer = setTimeout(() => {
-          handleSquareClick(aiMoveSequence.move.targetX, aiMoveSequence.move.targetY);
+          handleSquareClick(aiMoveSequence.move.targetX, aiMoveSequence.move.targetY, true);
           setAiMoveSequence(null);
         }, 500);
         return () => clearTimeout(timer);

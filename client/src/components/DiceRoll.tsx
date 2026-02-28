@@ -10,12 +10,13 @@ interface Props {
   defenderRoll: number;
   defenderStats: number;
   defenderDice: number;
+  defenderDebuff: number;
   isRolling: boolean;
 }
 
 export const DiceRoll: React.FC<Props> = ({ 
   attackerRoll, attackerStats, attackerDice,
-  defenderRoll, defenderStats, defenderDice, 
+  defenderRoll, defenderStats, defenderDice, defenderDebuff,
   isRolling 
 }) => {
   const attackerGroupRef = useRef<THREE.Group>(null);
@@ -121,6 +122,11 @@ export const DiceRoll: React.FC<Props> = ({
           <Text position={[0, -2.5, 1.1]} fontSize={0.6} color="#ffeb3b" outlineWidth={0.08} outlineColor="black" fontWeight="bold">
             +{defenderStats} Defends
           </Text>
+          {defenderDebuff > 0 && (
+            <Text position={[0, -3.2, 1.1]} fontSize={0.4} color="#ff5252" outlineWidth={0.05} outlineColor="black" fontWeight="bold">
+              - {defenderDebuff} VULNERABLE
+            </Text>
+          )}
         </Billboard>
       </group>
     </group>

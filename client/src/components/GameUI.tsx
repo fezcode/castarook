@@ -267,6 +267,7 @@ export const GameUI: React.FC<Props> = ({
               <ul style={{ listStyleType: 'square' }}>
                 <li><strong>Skirmishes:</strong> Every unit has a unique die (Pawn: D6, Knight: D10, Bishop: D12, Rook: D15, Queen: D18, King: D20).</li>
                 <li><strong>Valor & Health:</strong> Totals include battle-hardened stats (max +5). Damage is dealt based on the roll difference. Units perish only at 0 HP.</li>
+                <li><strong>Opportunity Attack:</strong> Any unit that has just moved becomes <strong>Vulnerable (-2 Defense)</strong> until the start of its next turn.</li>
                 <li><strong>Advanced Maneuvers:</strong>
                   <ul style={{ color: '#d4af37' }}>
                     <li>Promotion: Reach the end to crown a Queen.</li>
@@ -432,7 +433,7 @@ export const GameUI: React.FC<Props> = ({
               Attacker (D{battleResult.attackerDice}): {battleResult.attackerRoll} + {battleResult.attackerStats} = <strong>{battleResult.attackerTotal}</strong>
             </div>
             <div style={{ fontSize: '22px', color: '#f0d9b5' }}>
-              Defender (D{battleResult.defenderDice}): {battleResult.defenderRoll} + {battleResult.defenderStats} = <strong>{battleResult.defenderTotal}</strong>
+              Defender (D{battleResult.defenderDice}): {battleResult.defenderRoll} + {battleResult.defenderStats} {battleResult.defenderDebuff > 0 ? `- ${battleResult.defenderDebuff} (Vulnerable)` : ''} = <strong>{battleResult.defenderTotal}</strong>
             </div>
           </div>
           <h2 style={{ fontSize: '24px', margin: '0 0 25px 0', opacity: 0.9, fontStyle: 'italic' }}>
@@ -478,6 +479,11 @@ export const GameUI: React.FC<Props> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '24px' }}>🛡️</span> <span>Walls Defended: <strong>{selectedPiece.defends}</strong> {selectedPiece.defends >= 5 && <small style={{ color: '#4caf50', fontSize: '12px' }}>(MAX)</small>}</span>
               </div>
+              {selectedPiece.isDebuffed && (
+                <div style={{ marginTop: '5px', color: '#ff5252', fontSize: '14px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ fontSize: '18px' }}>⚠️</span> VULNERABLE (-2 DEF)
+                </div>
+              )}
             </div>
           </div>
         )}
