@@ -58,7 +58,7 @@ function App() {
     boardStyle, windStrength, whiteColor, blackColor,
     setBoardStyle, setWindStrength, setWhiteColor, setBlackColor,
     setHasStarted, setIsNight, setIsPaused, setFogNear, setFogFar,
-    resetGame, handleSquareClick, setBattleResult 
+    resetGame, handleSquareClick, setBattleResult, isVsAI, setIsVsAI 
   } = useChessGame();
 
   const selectedPiece = useMemo(() => 
@@ -171,6 +171,8 @@ function App() {
         setIsPaused={setIsPaused}
         resetGame={resetGame}
         setBattleResult={setBattleResult}
+        isVsAI={isVsAI}
+        setIsVsAI={setIsVsAI}
       />
     </div>
   );

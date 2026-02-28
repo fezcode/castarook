@@ -28,6 +28,8 @@ interface Props {
   setIsPaused: (paused: boolean) => void;
   resetGame: () => void;
   setBattleResult: (result: BattleResult | null) => void;
+  isVsAI: boolean;
+  setIsVsAI: (vsAI: boolean) => void;
 }
 
 export const GameUI: React.FC<Props> = ({ 
@@ -36,9 +38,11 @@ export const GameUI: React.FC<Props> = ({
   boardStyle, windStrength, whiteColor, blackColor,
   setBoardStyle, setWindStrength, setWhiteColor, setBlackColor,
   setFogNear, setFogFar,
-  setHasStarted, setIsNight, setIsPaused, resetGame, setBattleResult 
+  setHasStarted, setIsNight, setIsPaused, resetGame, setBattleResult,
+  isVsAI, setIsVsAI
 }) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
+  const [showAIWarning, setShowAIWarning] = React.useState(false);
 
   const getLogColor = (type: LogEntry['type']) => {
     switch (type) {
@@ -135,9 +139,14 @@ export const GameUI: React.FC<Props> = ({
               RPG<span style={{ color: '#d4af37' }}>CHESS</span>
             </h1>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '320px', margin: '0 auto' }}>
-              <button onClick={() => setHasStarted(true)} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', border: '2px solid #fff', fontSize: '24px', fontWeight: 'bold', padding: '15px' }}>Start Campaign</button>
+              <button onClick={() => { setIsVsAI(false); setHasStarted(true); }} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', border: '2px solid #fff', fontSize: '20px', fontWeight: 'bold', padding: '15px' }}>Player vs Player</button>
+              
+              <div>
+                <button onClick={() => { setIsVsAI(true); setHasStarted(true); }} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #546e7a, #37474f)', color: '#fff', border: '2px solid #b0bec5', fontSize: '20px', fontWeight: 'bold', padding: '15px', marginBottom: '5px' }}>Player vs AI (Beta)</button>
+                <div style={{ color: '#ffb74d', fontSize: '12px', fontStyle: 'italic', letterSpacing: '1px' }}>Warning: The AI is ruthless, but unpredictable.</div>
+              </div>
+
               <button onClick={() => setIsTutorialOpen(true)} style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#d4af37' }}>Learn the Rules</button>
-              <button style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#aaa', border: '1px solid #444', cursor: 'not-allowed' }}>Multiplayer (Coming)</button>
             </div>
             <div style={{ width: '200px', height: '1px', background: 'rgba(212, 175, 55, 0.3)', margin: '40px auto 0 auto' }}></div>
             <p style={{ color: '#666', fontSize: '12px', marginTop: '10px', textTransform: 'uppercase', letterSpacing: '2px' }}>Built for the Workhammer Suite</p>

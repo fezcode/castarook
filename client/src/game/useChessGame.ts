@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import type { Piece, BattleResult, LogEntry } from '../types';
+import { useState, useEffect } from 'react';
+import type { Piece, BattleResult, LogEntry, Position } from '../types';
 import { setupBoard, getValidMoves, rollDice, getDiceSides } from './ChessLogic';
+import { calculateBestMove } from './ChessAI';
 
 export const useChessGame = () => {
   const [pieces, setPieces] = useState<Piece[]>(setupBoard());
@@ -12,6 +13,8 @@ export const useChessGame = () => {
   const [winner, setWinner] = useState<'white' | 'black' | null>(null);
   const [isNight, setIsNight] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isVsAI, setIsVsAI] = useState(false);
+  const [aiMoveSequence, setAiMoveSequence] = useState<{ step: number, move: { startX: number, startY: number, targetX: number, targetY: number } } | null>(null);
   const [fogNear, setFogNear] = useState(10);
   const [fogFar, setFogFar] = useState(80);
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -19,6 +22,39 @@ export const useChessGame = () => {
   const [windStrength, setWindStrength] = useState(1.0);
   const [whiteColor, setWhiteColor] = useState('#f0d9b5');
   const [blackColor, setBlackColor] = useState('#4a4a4a');
+
+  // --- AI Logic ---
+  useEffect(() => {
+    if (isVsAI && turn === 'black' && !isRolling && !isPaused && !winner && hasStarted && !aiMoveSequence) {
+      // Small delay to simulate "thinking" and let the UI settle
+      const thinkTimer = setTimeout(() => {
+        const move = calculateBestMove(pieces, 'black');
+        if (move) {
+          setAiMoveSequence({ step: 1, move: { startX: move.piece.x, startY: move.piece.y, targetX: move.target.x, targetY: move.target.y } });
+        }
+      }, 800);
+      return () => clearTimeout(thinkTimer);
+    }
+  }, [pieces, turn, isVsAI, isRolling, isPaused, winner, hasStarted, aiMoveSequence]);
+
+  useEffect(() => {
+    if (aiMoveSequence && !isPaused && !winner) {
+      if (aiMoveSequence.step === 1) {
+        const timer = setTimeout(() => {
+          handleSquareClick(aiMoveSequence.move.startX, aiMoveSequence.move.startY);
+          setAiMoveSequence(prev => prev ? { ...prev, step: 2 } : null);
+        }, 300);
+        return () => clearTimeout(timer);
+      } else if (aiMoveSequence.step === 2) {
+        const timer = setTimeout(() => {
+          handleSquareClick(aiMoveSequence.move.targetX, aiMoveSequence.move.targetY);
+          setAiMoveSequence(null);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [aiMoveSequence, isPaused, winner, handleSquareClick]);
+  // --------------
 
   const addLog = (message: string, type: LogEntry['type']) => {
     const newLog: LogEntry = {
@@ -267,6 +303,8 @@ export const useChessGame = () => {
     setIsPaused,
     resetGame,
     handleSquareClick,
-    setBattleResult
+    setBattleResult,
+    isVsAI,
+    setIsVsAI
   };
 };
