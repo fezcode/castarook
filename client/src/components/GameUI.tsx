@@ -137,7 +137,7 @@ export const GameUI: React.FC<Props> = ({
             <div style={{ width: '100px', height: '2px', background: '#d4af37', margin: '0 auto 20px auto', boxShadow: '0 0 10px #d4af37' }}></div>
             <h2 style={{ color: '#d4af37', fontSize: '24px', margin: 0, textTransform: 'uppercase', letterSpacing: '6px', opacity: 0.8 }}>A Strategic Saga</h2>
             <h1 style={{ color: '#fff', fontSize: '100px', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '12px', fontWeight: 'bold', textShadow: '0 0 20px rgba(212, 175, 55, 0.5), 2px 2px 0px #000' }}>
-              RPG<span style={{ color: '#d4af37' }}>CHESS</span>
+              CASTA<span style={{ color: '#d4af37' }}>ROOK</span>
             </h1>
             <div style={{ color: '#d4af37', fontSize: '16px', fontWeight: 'bold', marginBottom: '30px', letterSpacing: '3px', textShadow: '1px 1px 0px #000' }}>v{packageJson.version}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '320px', margin: '0 auto' }}>

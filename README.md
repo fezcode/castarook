@@ -1,6 +1,6 @@
-# ⚔️ RPG CHESS: A Strategic Saga
+# ⚔️ CASTAROOK: A Strategic Saga
 
-RPG Chess is an immersive 3D chess game that blends standard chess strategy with D&D-inspired RPG elements. Set in a living, breathing valley featuring dynamic weather, procedural terrain, and a cinematic "Age of Empires" inspired interface.
+Castarook is an immersive 3D chess game that blends standard chess strategy with D&D-inspired RPG elements. Set in a living, breathing valley featuring dynamic weather, procedural terrain, and a cinematic "Age of Empires" inspired interface.
 
 ## 📜 The Core Mechanics
 
