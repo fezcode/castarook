@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Background Drop Shadow for depth -->
+  <path d="M 12 72 L 20 22 L 35 48 L 50 12 L 65 48 L 80 22 L 88 72 Z" fill="#000000" opacity="0.3" transform="translate(0, 4)" />
+  
+  <!-- Main Golden Crown Body -->
+  <path d="M 10 70 L 18 20 L 33 46 L 50 10 L 67 46 L 82 20 L 90 70 Z" fill="#d4af37" stroke="#000000" stroke-width="4" stroke-linejoin="round" />
+  
+  <!-- Crown Base / Band -->
+  <rect x="10" y="70" width="80" height="15" rx="2" fill="#aa8a2e" stroke="#000000" stroke-width="4" />
+  <rect x="14" y="74" width="72" height="7" rx="1" fill="#d4af37" />
+
+  <!-- Jewels / Accents -->
+  <!-- Left Peak Gem -->
+  <circle cx="18" cy="20" r="5" fill="#1a1a1a" stroke="#000000" stroke-width="2" />
+  <circle cx="18" cy="20" r="2" fill="#444" />
+  
+  <!-- Left-Mid Peak Gem -->
+  <circle cx="33" cy="46" r="4" fill="#1a1a1a" stroke="#000000" stroke-width="2" />
+  
+  <!-- Center Peak Gem -->
+  <circle cx="50" cy="10" r="6" fill="#1a1a1a" stroke="#000000" stroke-width="2" />
+  <path d="M 50 6 L 54 10 L 50 14 L 46 10 Z" fill="#d4af37" />
+
+  <!-- Right-Mid Peak Gem -->
+  <circle cx="67" cy="46" r="4" fill="#1a1a1a" stroke="#000000" stroke-width="2" />
+  
+  <!-- Right Peak Gem -->
+  <circle cx="82" cy="20" r="5" fill="#1a1a1a" stroke="#000000" stroke-width="2" />
+  <circle cx="82" cy="20" r="2" fill="#444" />
+
+  <!-- Base Gems -->
+  <circle cx="25" cy="77.5" r="3" fill="#1a1a1a" stroke="#000" stroke-width="1" />
+  <circle cx="50" cy="77.5" r="4" fill="#1a1a1a" stroke="#000" stroke-width="1.5" />
+  <circle cx="75" cy="77.5" r="3" fill="#1a1a1a" stroke="#000" stroke-width="1" />
+  
+  <!-- Highlights / Shading -->
+  <path d="M 15 65 L 21 28 L 32 50 L 50 18" fill="none" stroke="#fff" stroke-width="2" opacity="0.3" stroke-linecap="round" />
+</svg>
