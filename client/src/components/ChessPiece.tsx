@@ -240,17 +240,17 @@ export const ChessPiece: React.FC<Props> = ({ piece, isSelected, onClick, custom
       )}
 
       {/* Health Bar Billboard */}
-      <Billboard position={[0, 2.5, 0]} follow={true}>
+      <Billboard position={[0, 2.5, 0]} follow={true} pointerEvents="none">
         <group>
-          <mesh position={[0, 0, -0.02]}>
+          <mesh position={[0, 0, -0.02]} raycast={() => null}>
             <planeGeometry args={[0.64, 0.14]} />
             <meshBasicMaterial color="black" />
           </mesh>
-          <mesh position={[0, 0, -0.01]}>
+          <mesh position={[0, 0, -0.01]} raycast={() => null}>
             <planeGeometry args={[0.6, 0.1]} />
             <meshBasicMaterial color="#333" />
           </mesh>
-          <mesh position={[( (piece.hp / piece.maxHp) - 1 ) * 0.3, 0, 0]}>
+          <mesh position={[( (piece.hp / piece.maxHp) - 1 ) * 0.3, 0, 0]} raycast={() => null}>
             <planeGeometry args={[Math.max(0.01, 0.6 * (piece.hp / piece.maxHp)), 0.1]} />
             <meshBasicMaterial color={piece.hp / piece.maxHp > 0.5 ? "#4caf50" : piece.hp / piece.maxHp > 0.2 ? "#ffeb3b" : "#f44336"} />
           </mesh>
@@ -261,6 +261,7 @@ export const ChessPiece: React.FC<Props> = ({ piece, isSelected, onClick, custom
             outlineWidth={0.015} 
             outlineColor="black"
             fontWeight="bold"
+            raycast={() => null}
           >
             {Math.ceil(piece.hp)} / {piece.maxHp}
           </Text>
@@ -268,14 +269,14 @@ export const ChessPiece: React.FC<Props> = ({ piece, isSelected, onClick, custom
       </Billboard>
       
       {(piece.kills > 0 || piece.defends > 0) && (
-        <Billboard position={[0, 3.0, 0]} follow={true}>
+        <Billboard position={[0, 3.0, 0]} follow={true} pointerEvents="none">
           {piece.kills > 0 && (
-            <Text position={[0, 0.2, 0]} fontSize={0.25} color="#ff8a80" outlineWidth={0.02} outlineColor="black">
+            <Text position={[0, 0.2, 0]} fontSize={0.25} color="#ff8a80" outlineWidth={0.02} outlineColor="black" raycast={() => null}>
               ⚔️{piece.kills}
             </Text>
           )}
           {piece.defends > 0 && (
-            <Text position={[0, -0.2, 0]} fontSize={0.25} color="#82b1ff" outlineWidth={0.02} outlineColor="black">
+            <Text position={[0, -0.2, 0]} fontSize={0.25} color="#82b1ff" outlineWidth={0.02} outlineColor="black" raycast={() => null}>
               🛡️{piece.defends}
             </Text>
           )}

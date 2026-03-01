@@ -54,6 +54,7 @@ interface Props {
   }) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = React.useState(false);
+  const [isChangelogOpen, setIsChangelogOpen] = React.useState(false);
   const [showAIWarning, setShowAIWarning] = React.useState(false);
 
   const getLogColor = (type: LogEntry['type']) => {
@@ -161,6 +162,7 @@ interface Props {
               </div>
 
               <button onClick={() => setIsTutorialOpen(true)} style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#d4af37' }}>Learn the Rules</button>
+              <button onClick={() => { setIsChangelogOpen(true); playSound('menu'); }} style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#d4af37' }}>Changelog</button>
               <button onClick={() => setIsCreditsOpen(true)} style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#d4af37' }}>Credits</button>
             </div>
             <div style={{ width: '200px', height: '1px', background: 'rgba(212, 175, 55, 0.3)', margin: '40px auto 20px auto' }}></div>
@@ -310,6 +312,61 @@ interface Props {
             </div>
             <button onClick={() => { setIsTutorialOpen(false); playSound('menu'); }} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', marginTop: '30px', fontWeight: 'bold' }}>
               Back to the Front
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Changelog Overlay */}
+      {isChangelogOpen && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          pointerEvents: 'auto',
+          zIndex: 50
+        }}>
+          <div style={{ ...aoeBoxStyle, padding: '40px', borderRadius: '8px', maxWidth: '600px', width: '90%', textAlign: 'center', border: '4px double #d4af37', display: 'flex', flexDirection: 'column', maxHeight: '85vh' }}>
+            <h1 style={{ color: '#d4af37', marginTop: 0, fontSize: '36px', textTransform: 'uppercase' }}>War Room Updates</h1>
+            
+            <div style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              textAlign: 'left', 
+              paddingRight: '15px',
+              marginBottom: '20px'
+            }}>
+              <div style={{ marginBottom: '25px' }}>
+                <h2 style={{ color: '#fff', borderBottom: '1px solid #d4af37', paddingBottom: '5px' }}>v0.5.0 - The Siege Update</h2>
+                <ul style={{ color: '#f0d9b5', lineHeight: '1.6' }}>
+                  <li><strong>Siege Overhaul:</strong> Interactive Onagers. Click to target single units for 12-16 DMG.</li>
+                  <li><strong>Opportunity Attacks:</strong> Moving units become Vulnerable (-2 DEF) for 1 turn.</li>
+                  <li><strong>Bullseye Halo:</strong> New pulsing red indicators for vulnerable units.</li>
+                  <li><strong>Audio Engine:</strong> Dynamic BGM, local SFX, and random ambient sounds.</li>
+                  <li><strong>UX Fixes:</strong> Click-through health bars and stable scenery.</li>
+                </ul>
+              </div>
+
+              <div style={{ marginBottom: '25px' }}>
+                <h2 style={{ color: '#fff', borderBottom: '1px solid #d4af37', paddingBottom: '5px' }}>v0.4.6 - Castarook Ascendant</h2>
+                <ul style={{ color: '#f0d9b5', lineHeight: '1.6' }}>
+                  <li><strong>Rebranding:</strong> Project officially renamed to CASTAROOK.</li>
+                  <li><strong>Piece Dice:</strong> Scaled combat dice (Pawn D6 to King D20).</li>
+                  <li><strong>Greedy AI:</strong> Added Singleplayer mode with strategic logic.</li>
+                  <li><strong>Terrain:</strong> Introduced Stone Plaza and procedural landmarks.</li>
+                </ul>
+              </div>
+            </div>
+
+            <button onClick={() => { setIsChangelogOpen(false); playSound('menu'); }} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', fontWeight: 'bold' }}>
+              Back to Command
             </button>
           </div>
         </div>
