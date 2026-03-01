@@ -358,7 +358,7 @@ export const useChessGame = (playSound: (name: any) => void) => {
 
   // --- AI Logic ---
   useEffect(() => {
-    if (isVsAI && turn === 'black' && !isRolling && !isPaused && !winner && hasStarted && !aiMoveSequence && !battleResult) {
+    if (isVsAI && turn === 'black' && !isRolling && !isPaused && !winner && hasStarted && !aiMoveSequence && !battleResult && !isSiegeFiring) {
       // Small delay to simulate "thinking" and let the UI settle
       const thinkTimer = setTimeout(() => {
         const move = calculateBestMove(pieces, 'black', blackSiegeUsed);
