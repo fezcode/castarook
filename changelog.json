@@ -1,5 +1,16 @@
 [
   {
+    "version": "0.5.3",
+    "title": "Tactical Freedom",
+    "date": "2026-03-02",
+    "changes": [
+      "Strategic View: Gain the ability to 'View Scene' after winning to inspect the final battlefield.",
+      "Battle Command: Choose your side (White or Black) when challenging the AI.",
+      "AI Discipline: Fixed a bug where the AI could fire its catapult and move a piece in the same turn.",
+      "Operational Fix: 'Abandon Match' now functions correctly from the Pause Menu even after the match concludes."
+    ]
+  },
+  {
     "version": "0.5.2",
     "title": "Tactical Insight",
     "date": "2026-03-01",
