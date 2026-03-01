@@ -1,6 +1,6 @@
 # 👑 CASTAROOK: A Strategic Saga
 
-# [🎮 PLAY CASTAROOK NOW!](https://fezcode.com/g/castarook/)
+# [🎮 PLAY CASTAROOK NOW!](https://fezcode.com/castarook/)
 
 **Castarook** is an immersive 3D chess game that blends standard chess strategy with D&D-inspired RPG elements. Set in a living, breathing valley featuring dynamic weather, procedural terrain, and a beautiful interface.
 
