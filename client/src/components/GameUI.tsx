@@ -340,8 +340,10 @@ interface Props {
               flex: 1, 
               overflowY: 'auto', 
               textAlign: 'left', 
-              paddingRight: '15px',
-              marginBottom: '20px'
+              paddingRight: '20px',
+              marginBottom: '20px',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#d4af37 rgba(0,0,0,0.2)'
             }}>
               <div style={{ marginBottom: '25px' }}>
                 <h2 style={{ color: '#fff', borderBottom: '1px solid #d4af37', paddingBottom: '5px' }}>v0.5.0 - The Siege Update</h2>
