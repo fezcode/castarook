@@ -390,7 +390,7 @@ interface Props {
             <p style={{ fontSize: '24px', margin: '0 0 40px 0', opacity: 0.8, fontStyle: 'italic' }}>
               The saga concludes. The {winner} throne stands supreme.
             </p>
-            <button onClick={resetGame} style={{ ...menuButtonStyle, background: '#2a1a0a', color: '#d4af37', padding: '20px', fontSize: '24px', fontWeight: 'bold' }}>
+            <button onClick={() => { resetGame(); playSound('menu'); }} style={{ ...menuButtonStyle, background: '#2a1a0a', color: '#d4af37', padding: '20px', fontSize: '24px', fontWeight: 'bold' }}>
               Begin a New Chapter
             </button>
           </div>

@@ -200,6 +200,7 @@ function App() {
         isMuted={isMuted}
         setIsMuted={setIsMuted}
         startMusic={startMusic}
+        playSound={playSound}
       />
     </div>
   );

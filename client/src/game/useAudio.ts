@@ -13,7 +13,7 @@ const SOUND_URLS = {
 
 const AMBIENT_URLS = {
   wood: '/sounds/wood-chop-axe-hit-02.mp3',
-  river: '/sounds/river-2.mp3',
+  wind: '/sounds/wind-howl-01.mp3',
   shovel: '/sounds/shovel-into-snow-1.mp3',
 };
 
@@ -62,16 +62,25 @@ export const useAudio = () => {
 
   // Ambient sound scheduler
   useEffect(() => {
-    if (!isMusicStarted || isMuted) return;
+    if (!isMusicStarted || isMuted) {
+      // If muted, stop all active ambient sounds immediately
+      Object.values(ambientObjects).forEach(amb => {
+        amb.pause();
+        amb.currentTime = 0;
+      });
+      return;
+    }
 
     const playRandomAmbient = () => {
+      if (isMuted) return;
+      
       const keys = Object.keys(ambientObjects);
       const randomKey = keys[Math.floor(Math.random() * keys.length)];
       const audio = ambientObjects[randomKey];
       
       if (audio) {
         audio.currentTime = 0;
-        audio.volume = volume * 0.6; // Ambients slightly quieter than SFX
+        audio.volume = volume * 0.6;
         audio.play().catch(() => {});
       }
 
@@ -82,7 +91,7 @@ export const useAudio = () => {
 
     const timer = setTimeout(playRandomAmbient, 10000); // Start first one after 10s
     return () => clearTimeout(timer);
-  }, [isMusicStarted, isMuted, volume, ambientObjects]);
+  }, [isMusicStarted, isMuted, ambientObjects]); // Remove volume from deps to avoid restarting timer on volume change
 
   useEffect(() => {
     const currentVol = isMuted ? 0 : volume;
