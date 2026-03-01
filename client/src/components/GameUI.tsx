@@ -52,17 +52,16 @@ interface Props {
   setBoardStyle, setWindStrength, setWhiteColor, setBlackColor, setShowCoordinates,
   setFogNear, setFogFar,
   setHasStarted, setIsNight, setIsPaused, resetGame, setBattleResult,
-  isVsAI, setIsVsAI, turnCount, whiteSiegeUsed, blackSiegeUsed, fireSiege,
+  isVsAI, setIsVsAI, turnCount, whiteSiegeUsed, blackSiegeUsed,
   volume, setVolume, isMuted, setIsMuted, startMusic, playSound
   }) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = React.useState(false);
   const [isChangelogOpen, setIsChangelogOpen] = React.useState(false);
-  const [showAIWarning, setShowAIWarning] = React.useState(false);
   const [changelogData, setChangelogData] = React.useState<any[]>([]);
 
   React.useEffect(() => {
-    fetch('/changelog.json')
+    fetch(`${import.meta.env.BASE_URL}changelog.json`)
       .then(res => res.json())
       .then(data => setChangelogData(data))
       .catch(err => console.error("Failed to load changelog:", err));
@@ -157,7 +156,7 @@ interface Props {
             textAlign: 'center',
             animation: 'popIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
           }}>
-            <img src="/favicon.svg" alt="Crown Logo" style={{ width: '80px', height: '80px', marginBottom: '10px', filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.5))' }} />
+            <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="Crown Logo" style={{ width: '80px', height: '80px', marginBottom: '10px', filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.5))' }} />
             <div style={{ width: '100px', height: '2px', background: '#d4af37', margin: '0 auto 20px auto', boxShadow: '0 0 10px #d4af37' }}></div>
             <h2 style={{ color: '#d4af37', fontSize: '24px', margin: 0, textTransform: 'uppercase', letterSpacing: '6px', opacity: 0.8 }}>A Strategic Saga</h2>
             <h1 style={{ color: '#fff', fontSize: '100px', margin: '5px 0 0 0', textTransform: 'uppercase', letterSpacing: '12px', fontWeight: 'bold', textShadow: '0 0 20px rgba(212, 175, 55, 0.5), 2px 2px 0px #000' }}>

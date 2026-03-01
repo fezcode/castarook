@@ -1,23 +1,25 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 
 // Using local reliable audio assets from public/sounds
+const basePath = import.meta.env.BASE_URL;
+
 const SOUND_URLS = {
-  select: '/sounds/button-16a.mp3',
-  move: '/sounds/marching.mp3',
-  attack: '/sounds/clong-2.mp3',
-  victory: '/sounds/button-21.mp3',
-  defeat: '/sounds/button-19.mp3',
-  siege: '/sounds/bomb-falling-and-exploding-01.mp3',
-  menu: '/sounds/page-flip-03.mp3',
+  select: `${basePath}sounds/button-16a.mp3`,
+  move: `${basePath}sounds/marching.mp3`,
+  attack: `${basePath}sounds/clong-2.mp3`,
+  victory: `${basePath}sounds/button-21.mp3`,
+  defeat: `${basePath}sounds/button-19.mp3`,
+  siege: `${basePath}sounds/bomb-falling-and-exploding-01.mp3`,
+  menu: `${basePath}sounds/page-flip-03.mp3`,
 };
 
 const AMBIENT_URLS = {
-  wood: '/sounds/wood-chop-axe-hit-02.mp3',
-  wind: '/sounds/wind-howl-01.mp3',
-  shovel: '/sounds/shovel-into-snow-1.mp3',
+  wood: `${basePath}sounds/wood-chop-axe-hit-02.mp3`,
+  wind: `${basePath}sounds/wind-howl-01.mp3`,
+  shovel: `${basePath}sounds/shovel-into-snow-1.mp3`,
 };
 
-const BGM_URL = '/sounds/fire-1.mp3';
+const BGM_URL = `${basePath}sounds/fire-1.mp3`;
 
 export const useAudio = () => {
   const [volume, setVolume] = useState(0.5);
@@ -121,7 +123,7 @@ export const useAudio = () => {
     if (bgmRef.current && bgmRef.current.paused) {
       bgmRef.current.play().then(() => {
         setIsMusicStarted(true);
-      }).catch(e => console.log("BGM play blocked by browser policy"));
+      }).catch(_e => console.log("BGM play blocked by browser policy"));
     }
   };
 

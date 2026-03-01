@@ -13,7 +13,7 @@ import { CombatEffect } from './components/CombatEffect';
 import { Scenery } from './components/Scenery';
 
 // Component to handle camera reset logic
-const CameraHandler = ({ controlsRef }: { controlsRef: React.RefObject<OrbitControlsImpl> }) => {
+const CameraHandler = ({ controlsRef }: { controlsRef: React.RefObject<OrbitControlsImpl | null> }) => {
   const { camera } = useThree();
 
   const resetCamera = () => {

@@ -240,7 +240,7 @@ export const ChessPiece: React.FC<Props> = ({ piece, isSelected, onClick, custom
       )}
 
       {/* Health Bar Billboard */}
-      <Billboard position={[0, 2.5, 0]} follow={true} pointerEvents="none">
+      <Billboard position={[0, 2.5, 0]} follow={true}>
         <group>
           <mesh position={[0, 0, -0.02]} raycast={() => null}>
             <planeGeometry args={[0.64, 0.14]} />
@@ -269,7 +269,7 @@ export const ChessPiece: React.FC<Props> = ({ piece, isSelected, onClick, custom
       </Billboard>
       
       {(piece.kills > 0 || piece.defends > 0) && (
-        <Billboard position={[0, 3.0, 0]} follow={true} pointerEvents="none">
+        <Billboard position={[0, 3.0, 0]} follow={true}>
           {piece.kills > 0 && (
             <Text position={[0, 0.2, 0]} fontSize={0.25} color="#ff8a80" outlineWidth={0.02} outlineColor="black" raycast={() => null}>
               ⚔️{piece.kills}

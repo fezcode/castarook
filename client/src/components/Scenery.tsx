@@ -1,5 +1,5 @@
 import { useRef, useMemo, useState } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree as _useThree } from '@react-three/fiber';
 import { Sparkles, Float, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -474,40 +474,6 @@ const StonePlaza = ({ isNight }: { isNight: boolean }) => {
         </group>
       ))}
     </group>
-  );
-};
-
-const MountainStream = ({ windStrength = 1.0 }: { windStrength?: number }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const riverGeom = useMemo(() => {
-    const segments = 100;
-    const width = 12;
-    const length = 200;
-    const geometry = new THREE.PlaneGeometry(width, length, 1, segments);
-    const pos = geometry.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const z = pos.getY(i);
-      // Synchronize with terrain's river2Center: -50 + Math.cos(z * 0.06) * 8
-      const xOffset = Math.cos(z * 0.06) * 8;
-      pos.setX(i, x + xOffset);
-      pos.setZ(i, -0.6 + 0.55); 
-    }
-    geometry.computeVertexNormals();
-    return geometry;
-  }, []);
-  
-  useFrame((state) => {
-    if (meshRef.current) {
-      const time = state.clock.getElapsedTime();
-      meshRef.current.position.y = -0.55 + Math.sin(time * 0.4) * 0.02 * windStrength;
-    }
-  });
-
-  return (
-    <mesh geometry={riverGeom} ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} position={[-50, -0.55, 0]} receiveShadow>
-      <meshStandardMaterial color="#4fc3f7" transparent opacity={0.6} roughness={0.1} metalness={0.8} emissive="#0288d1" emissiveIntensity={0.3} />
-    </mesh>
   );
 };
 

@@ -1,12 +1,6 @@
 import type { Piece, PieceType, PlayerColor, Position } from '../types';
 import { getValidMoves, getDiceSides } from './ChessLogic';
 
-interface Move {
-  piece: Piece;
-  target: Position;
-  score: number;
-}
-
 const getPieceValue = (type: PieceType): number => {
   switch (type) {
     case 'pawn': return 10;

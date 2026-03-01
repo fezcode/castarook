@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Piece, BattleResult, LogEntry, Position } from '../types';
+import type { Piece, BattleResult, LogEntry, Position as _Position } from '../types';
 import { setupBoard, getValidMoves, rollDice, getDiceSides } from './ChessLogic';
 import { calculateBestMove } from './ChessAI';
 
