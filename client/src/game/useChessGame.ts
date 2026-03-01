@@ -17,7 +17,7 @@ export const useChessGame = (playSound: (name: any) => void) => {
   const [isVsAI, setIsVsAI] = useState(false);
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
   const [turnCount, setTurnCount] = useState(1);
-  const [aiMoveSequence, setAiMoveSequence] = useState<{ step: number, move: { startX: number, startY: number, targetX: number, targetY: number } } | null>(null);
+  const [aiMoveSequence, setAiMoveSequence] = useState<{ step: number, move: { startX: number, startY: number, targetX: number, targetY: number }, aiColor?: 'white' | 'black' } | null>(null);
   const [fogNear, setFogNear] = useState(10);
   const [fogFar, setFogFar] = useState(80);
   const [logs, setLogs] = useState<LogEntry[]>([]);

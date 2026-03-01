@@ -253,7 +253,7 @@ interface Props {
             border: '3px double #d4af37',
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
           }}>
-            {turn}'s Command
+            {turn}'s Command {isVsAI && turn === playerColor && <span style={{ fontSize: '12px', opacity: 0.7 }}>(YOU)</span>}
           </div>
           <div style={{
             marginTop: '8px',
