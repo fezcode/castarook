@@ -15,6 +15,7 @@ export const useChessGame = (playSound: (name: any) => void) => {
   const [isNight, setIsNight] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isVsAI, setIsVsAI] = useState(false);
+  const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
   const [turnCount, setTurnCount] = useState(1);
   const [aiMoveSequence, setAiMoveSequence] = useState<{ step: number, move: { startX: number, startY: number, targetX: number, targetY: number } } | null>(null);
   const [fogNear, setFogNear] = useState(10);
@@ -138,7 +139,8 @@ export const useChessGame = (playSound: (name: any) => void) => {
     if (isRolling || isPaused || winner || !hasStarted) return; 
     
     // Block HUMAN input if it's the AI's turn
-    if (isVsAI && turn === 'black' && !isAiCall) return;
+    const aiColor = playerColor === 'white' ? 'black' : 'white';
+    if (isVsAI && turn === aiColor && !isAiCall) return;
 
     // Clear battle result on next action if it's already shown
     if (battleResult && !isRolling) setBattleResult(null);
@@ -358,30 +360,33 @@ export const useChessGame = (playSound: (name: any) => void) => {
 
   // --- AI Logic ---
   useEffect(() => {
-    if (isVsAI && turn === 'black' && !isRolling && !isPaused && !winner && hasStarted && !aiMoveSequence && !battleResult && !isSiegeFiring) {
+    const aiColor = playerColor === 'white' ? 'black' : 'white';
+    if (isVsAI && turn === aiColor && !isRolling && !isPaused && !winner && hasStarted && !aiMoveSequence && !battleResult && !isSiegeFiring) {
       // Small delay to simulate "thinking" and let the UI settle
       const thinkTimer = setTimeout(() => {
-        const move = calculateBestMove(pieces, 'black', blackSiegeUsed);
+        const siegeUsed = aiColor === 'white' ? whiteSiegeUsed : blackSiegeUsed;
+        const move = calculateBestMove(pieces, aiColor, siegeUsed);
         if (move) {
           if (move.isSiege) {
-            setAiMoveSequence({ step: 1, move: { startX: -1, startY: -1, targetX: move.target.x, targetY: move.target.y } });
+            setAiMoveSequence({ step: 1, move: { startX: -1, startY: -1, targetX: move.target.x, targetY: move.target.y }, aiColor });
           } else {
-            setAiMoveSequence({ step: 1, move: { startX: move.piece.x, startY: move.piece.y, targetX: move.target.x, targetY: move.target.y } });
+            setAiMoveSequence({ step: 1, move: { startX: move.piece.x, startY: move.piece.y, targetX: move.target.x, targetY: move.target.y }, aiColor });
           }
         }
       }, 800);
       return () => clearTimeout(thinkTimer);
     }
-  }, [pieces, turn, isVsAI, isRolling, isPaused, winner, hasStarted, aiMoveSequence, battleResult, blackSiegeUsed]);
+  }, [pieces, turn, isVsAI, playerColor, isRolling, isPaused, winner, hasStarted, aiMoveSequence, battleResult, whiteSiegeUsed, blackSiegeUsed, isSiegeFiring]);
 
   useEffect(() => {
     if (aiMoveSequence && !isPaused && !winner) {
       const isSiege = aiMoveSequence.move.startX === -1;
+      const aiColor = aiMoveSequence.aiColor || (playerColor === 'white' ? 'black' : 'white');
 
       if (aiMoveSequence.step === 1) {
         const timer = setTimeout(() => {
           if (isSiege) {
-            handleOnagerClick('black');
+            handleOnagerClick(aiColor);
           } else {
             handleSquareClick(aiMoveSequence.move.startX, aiMoveSequence.move.startY, true);
           }
@@ -396,7 +401,7 @@ export const useChessGame = (playSound: (name: any) => void) => {
         return () => clearTimeout(timer);
       }
     }
-  }, [aiMoveSequence, isPaused, winner, handleSquareClick, handleOnagerClick]);
+  }, [aiMoveSequence, isPaused, winner, handleSquareClick, handleOnagerClick, playerColor]);
   // --------------
 
   return {
@@ -433,6 +438,8 @@ export const useChessGame = (playSound: (name: any) => void) => {
     setBattleResult,
     isVsAI,
     setIsVsAI,
+    playerColor,
+    setPlayerColor,
     turnCount,
     whiteSiegeUsed,
     blackSiegeUsed,

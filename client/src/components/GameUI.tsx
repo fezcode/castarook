@@ -33,6 +33,8 @@ interface Props {
   setBattleResult: (result: BattleResult | null) => void;
   isVsAI: boolean;
   setIsVsAI: (vsAI: boolean) => void;
+  playerColor: 'white' | 'black';
+  setPlayerColor: (color: 'white' | 'black') => void;
   turnCount: number;
   whiteSiegeUsed: boolean;
   blackSiegeUsed: boolean;
@@ -52,12 +54,13 @@ interface Props {
   setBoardStyle, setWindStrength, setWhiteColor, setBlackColor, setShowCoordinates,
   setFogNear, setFogFar,
   setHasStarted, setIsNight, setIsPaused, resetGame, setBattleResult,
-  isVsAI, setIsVsAI, turnCount, whiteSiegeUsed, blackSiegeUsed,
+  isVsAI, setIsVsAI, playerColor, setPlayerColor, turnCount, whiteSiegeUsed, blackSiegeUsed,
   volume, setVolume, isMuted, setIsMuted, startMusic, playSound
   }) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = React.useState(false);
   const [isChangelogOpen, setIsChangelogOpen] = React.useState(false);
+  const [showAiColorSelect, setShowAiColorSelect] = React.useState(false);
   const [changelogData, setChangelogData] = React.useState<any[]>([]);
 
   React.useEffect(() => {
@@ -167,8 +170,17 @@ interface Props {
               <button onClick={() => { setIsVsAI(false); setHasStarted(true); startMusic(); }} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #d4af37, #aa8a2e)', color: '#000', border: '2px solid #fff', fontSize: '20px', fontWeight: 'bold', padding: '15px' }}>Player vs Player</button>
               
               <div>
-                <button onClick={() => { setIsVsAI(true); setHasStarted(true); startMusic(); }} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #546e7a, #37474f)', color: '#fff', border: '2px solid #b0bec5', fontSize: '20px', fontWeight: 'bold', padding: '15px', marginBottom: '5px' }}>Player vs AI (Beta)</button>
-                <div style={{ color: '#ffb74d', fontSize: '12px', fontStyle: 'italic', letterSpacing: '1px', lineHeight: '1.4' }}>Warning: The AI uses a greedy algorithm and may behave unpredictably or foolishly.</div>
+                {!showAiColorSelect ? (
+                  <>
+                    <button onClick={() => setShowAiColorSelect(true)} style={{ ...menuButtonStyle, background: 'linear-gradient(to bottom, #546e7a, #37474f)', color: '#fff', border: '2px solid #b0bec5', fontSize: '20px', fontWeight: 'bold', padding: '15px', marginBottom: '5px' }}>Player vs AI (Beta)</button>
+                    <div style={{ color: '#ffb74d', fontSize: '12px', fontStyle: 'italic', letterSpacing: '1px', lineHeight: '1.4' }}>Warning: The AI uses a greedy algorithm and may behave unpredictably or foolishly.</div>
+                  </>
+                ) : (
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '5px' }}>
+                    <button onClick={() => { setPlayerColor('white'); setIsVsAI(true); setHasStarted(true); startMusic(); }} style={{ ...menuButtonStyle, background: '#f0d9b5', color: '#000', flex: 1, padding: '15px', fontWeight: 'bold' }}>Play White</button>
+                    <button onClick={() => { setPlayerColor('black'); setIsVsAI(true); setHasStarted(true); startMusic(); }} style={{ ...menuButtonStyle, background: '#1a1510', color: '#d4af37', flex: 1, padding: '15px', fontWeight: 'bold' }}>Play Black</button>
+                  </div>
+                )}
               </div>
 
               <button onClick={() => setIsTutorialOpen(true)} style={{ ...menuButtonStyle, background: 'rgba(0,0,0,0.6)', color: '#d4af37' }}>Learn the Rules</button>

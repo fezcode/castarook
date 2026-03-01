@@ -60,7 +60,7 @@ function App() {
     boardStyle, windStrength, whiteColor, blackColor, showCoordinates,
     setBoardStyle, setWindStrength, setWhiteColor, setBlackColor, setShowCoordinates,
     setHasStarted, setIsNight, setIsPaused, setFogNear, setFogFar,
-    resetGame, handleSquareClick, handleOnagerClick, setBattleResult, isVsAI, setIsVsAI, turnCount,
+    resetGame, handleSquareClick, handleOnagerClick, setBattleResult, isVsAI, setIsVsAI, playerColor, setPlayerColor, turnCount,
     whiteSiegeUsed, blackSiegeUsed, isSiegeFiring, fireSiege, selectedOnagerColor
   } = useChessGame(playSound);
 
@@ -195,6 +195,8 @@ function App() {
         setBattleResult={setBattleResult}
         isVsAI={isVsAI}
         setIsVsAI={setIsVsAI}
+        playerColor={playerColor}
+        setPlayerColor={setPlayerColor}
         turnCount={turnCount}
         whiteSiegeUsed={whiteSiegeUsed}
         blackSiegeUsed={blackSiegeUsed}
