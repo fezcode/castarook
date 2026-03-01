@@ -1,6 +1,6 @@
-import { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Sparkles, Float } from '@react-three/drei';
+import { useRef, useMemo, useState } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { Sparkles, Float, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 
 const getTerrainHeight = (x: number, z: number) => {
@@ -539,7 +539,155 @@ const StoneBridge = ({ position, rotationY = 0, length = 22 }: { position: [numb
   );
 };
 
-export const Scenery = ({ isNight, windStrength = 1.0 }: { isNight: boolean, windStrength?: number }) => {
+const Onager = ({ position, rotationY = 0, isNight, isUsed, isSelected, color, onClick }: { 
+  position: [number, number, number], 
+  rotationY?: number, 
+  isNight: boolean, 
+  isUsed: boolean,
+  isSelected?: boolean,
+  color: string,
+  onClick: () => void 
+}) => {
+  const woodColor = isNight ? "#1a1510" : "#4d2c19";
+  const metalColor = "#333";
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered && !isUsed);
+  
+  return (
+    <group 
+      position={position} 
+      rotation={[0, rotationY, 0]} 
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      {/* Selection Glow */}
+      {isSelected && (
+        <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.2, 1.5, 32]} />
+          <meshBasicMaterial color="#fff" transparent opacity={0.5} />
+        </mesh>
+      )}
+
+      {/* Main Chassis */}
+      <group scale={0.7}>
+        {/* Longitudinal Beams */}
+        <mesh castShadow receiveShadow position={[0.6, 0.4, 0]}>
+          <boxGeometry args={[0.2, 0.3, 4]} />
+          <meshStandardMaterial color={woodColor} />
+        </mesh>
+        <mesh castShadow receiveShadow position={[-0.6, 0.4, 0]}>
+          <boxGeometry args={[0.2, 0.3, 4]} />
+          <meshStandardMaterial color={woodColor} />
+        </mesh>
+        
+        {/* Cross Beams */}
+        {[ -1.5, 0, 1.5 ].map(z => (
+          <mesh key={z} castShadow receiveShadow position={[0, 0.4, z]}>
+            <boxGeometry args={[1.4, 0.25, 0.2]} />
+            <meshStandardMaterial color={woodColor} />
+          </mesh>
+        ))}
+
+        {/* Wheels with detailed spokes */}
+        {[-0.8, 0.8].map(x => [ -1.6, 1.6 ].map(z => (
+          <group key={`${x}-${z}`} position={[x, 0.3, z]}>
+            <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.4, 0.4, 0.2, 16]} />
+              <meshStandardMaterial color="#222" />
+            </mesh>
+            <mesh rotation={[0, 0, Math.PI / 2]} position={[x > 0 ? 0.05 : -0.05, 0, 0]}>
+              <cylinderGeometry args={[0.1, 0.1, 0.3, 8]} />
+              <meshStandardMaterial color={metalColor} />
+            </mesh>
+          </group>
+        )))}
+
+        {/* Side Frames (A-Frame) */}
+        {[-0.6, 0.6].map(x => (
+          <group key={x} position={[x, 1.2, 0]}>
+            <mesh castShadow receiveShadow rotation={[0.4, 0, 0]} position={[0, 0, -0.4]}>
+              <boxGeometry args={[0.15, 1.8, 0.15]} />
+              <meshStandardMaterial color={woodColor} />
+            </mesh>
+            <mesh castShadow receiveShadow rotation={[-0.4, 0, 0]} position={[0, 0, 0.4]}>
+              <boxGeometry args={[0.15, 1.8, 0.15]} />
+              <meshStandardMaterial color={woodColor} />
+            </mesh>
+            {/* Horizontal axle support */}
+            <mesh castShadow receiveShadow position={[0, 0.7, 0]} rotation={[Math.PI/2, 0, 0]}>
+              <cylinderGeometry args={[0.1, 0.1, 1.2, 8]} />
+              <meshStandardMaterial color={metalColor} />
+            </mesh>
+          </group>
+        ))}
+
+        {/* THE ARM - Cocked (bottom) or Fired (top) */}
+        <group position={[0, 1.8, 0]} rotation={[isUsed ? -Math.PI / 6 : Math.PI / 3, 0, 0]}>
+          <mesh castShadow receiveShadow position={[0, 1.5, 0]}>
+            <boxGeometry args={[0.2, 3.5, 0.2]} />
+            <meshStandardMaterial color={woodColor} />
+          </mesh>
+          
+          {/* Team Color Stripe on Arm */}
+          <mesh position={[0, 1.5, 0.11]}>
+            <boxGeometry args={[0.1, 2, 0.02]} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+          </mesh>
+
+          {/* Bucket/Sling */}
+          <group position={[0, 3.2, 0]}>
+            <mesh castShadow>
+              <cylinderGeometry args={[0.5, 0.35, 0.6, 12]} />
+              <meshStandardMaterial color={metalColor} metalness={0.6} roughness={0.4} />
+            </mesh>
+            {/* Projectile (Rock) - Only visible if not used */}
+            {!isUsed && (
+              <mesh position={[0, 0.4, 0]} castShadow>
+                <icosahedronGeometry args={[0.35, 1]} />
+                <meshStandardMaterial color="#555" roughness={1} />
+              </mesh>
+            )}
+          </group>
+
+          {/* Counterweight */}
+          <mesh position={[0, -0.4, 0]} castShadow>
+            <boxGeometry args={[0.8, 0.8, 0.8]} />
+            <meshStandardMaterial color={metalColor} />
+          </mesh>
+        </group>
+
+        {/* Rope detail */}
+        {!isUsed && (
+          <mesh position={[0, 0.6, 1.5]} rotation={[0.8, 0, 0]}>
+            <cylinderGeometry args={[0.03, 0.03, 3, 6]} />
+            <meshStandardMaterial color="#8d6e63" />
+          </mesh>
+        )}
+      </group>
+    </group>
+  );
+};
+
+export const Scenery = ({ 
+  isNight, 
+  windStrength = 1.0, 
+  whiteSiegeUsed, 
+  blackSiegeUsed, 
+  selectedOnagerColor, 
+  whiteColor, 
+  blackColor, 
+  onOnagerClick 
+}: { 
+  isNight: boolean, 
+  windStrength?: number,
+  whiteSiegeUsed: boolean,
+  blackSiegeUsed: boolean,
+  selectedOnagerColor: 'white' | 'black' | null,
+  whiteColor: string,
+  blackColor: string,
+  onOnagerClick: (color: 'white' | 'black') => void
+}) => {
   const trees = useMemo(() => {
     const list = [];
     // More trees!
@@ -632,6 +780,25 @@ export const Scenery = ({ isNight, windStrength = 1.0 }: { isNight: boolean, win
       
       <Banner position={[-2, -0.5, -30]} color="#d32f2f" /><Banner position={[2, -0.5, -30]} color="#d32f2f" />
       <Banner position={[-2, -0.5, 30]} color="#1976d2" /><Banner position={[2, -0.5, 30]} color="#1976d2" />
+
+      {/* Siege Engines */}
+      <Onager 
+        position={[0, -0.15, -6.5]} 
+        isNight={isNight} 
+        isUsed={whiteSiegeUsed} 
+        isSelected={selectedOnagerColor === 'white'}
+        color={whiteColor}
+        onClick={() => onOnagerClick('white')}
+      />
+      <Onager 
+        position={[0, -0.15, 6.5]} 
+        rotationY={Math.PI} 
+        isNight={isNight} 
+        isUsed={blackSiegeUsed}
+        isSelected={selectedOnagerColor === 'black'}
+        color={blackColor}
+        onClick={() => onOnagerClick('black')}
+      />
 
       {decoItems.map((item) => <DecorativeItems key={`deco-${item.pos[0]}-${item.pos[2]}`} position={item.pos as [number, number, number]} rotationY={item.rot} />)}
 
