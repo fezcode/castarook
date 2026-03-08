@@ -1,5 +1,20 @@
 [
   {
+    "version": "0.6.0",
+    "title": "The Faith & Healing Update",
+    "date": "2026-03-08",
+    "changes": [
+      "New Support Unit: Monk. Deploy from the sidelines to convert non-Royalty units to your side (D20 roll).",
+      "New Support Unit: Healer. Deploy to restore health to your own units (D16 roll).",
+      "Model Overhaul: High-detail 3D models for all sideline support units (Monks, Healers, Onagers).",
+      "AI Wisdom: The AI now strategically employs Monks and Healers to pressure or sustain the frontlines.",
+      "Green Dice: New dedicated dice color for support actions (Monk/Healer).",
+      "Support Range: Monks and Healers, like Onagers, are restricted to the nearest 4 rows.",
+      "Combat Refinement: Support units roll against static thresholds for faster feedback.",
+      "Tutorial Update: Rules for the new support units have been added to the Chronicles of Battle."
+    ]
+  },
+  {
     "version": "0.5.3",
     "title": "Tactical Freedom",
     "date": "2026-03-02",
