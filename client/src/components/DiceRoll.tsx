@@ -97,7 +97,7 @@ export const DiceRoll: React.FC<Props> = ({
             </Text>
           )}
           <Billboard follow={true}>
-            <Text position={[0, 0, 1.1]} fontSize={0.6} color="white" anchorX="center" anchorY="middle">
+            <Text position={[0, 0, 1.1]} fontSize={0.6} color="white" anchorX="center" anchorY="middle" outlineWidth={0.05} outlineColor="black">
               {displayAttacker}
             </Text>
           </Billboard>
@@ -137,10 +137,9 @@ export const DiceRoll: React.FC<Props> = ({
               </Text>
             )}
             <Billboard follow={true}>
-              <Text position={[0, 0, 1.1]} fontSize={0.6} color="white" anchorX="center" anchorY="middle">
+              <Text position={[0, 0, 1.1]} fontSize={0.6} color="#82b1ff" anchorX="center" anchorY="middle" outlineWidth={0.05} outlineColor="black">
                 {displayDefender}
-              </Text>
-            </Billboard>
+              </Text>            </Billboard>
             <Text position={[0, -1.8, 1.1]} fontSize={0.5} color={isHealer ? "#81c784" : "#82b1ff"} outlineWidth={0.05} outlineColor="black">
               {getDefenderLabel()}
             </Text>
@@ -162,7 +161,7 @@ export const DiceRoll: React.FC<Props> = ({
       {(isMonk || isHealer) && (
         <group position={[2, 0, 0]}>
           <Billboard follow={true}>
-            <Text position={[0, 0, 1.1]} fontSize={1.2} color="white" anchorX="center" anchorY="middle">
+            <Text position={[0, 0, 1.1]} fontSize={1.2} color="#82b1ff" anchorX="center" anchorY="middle" outlineWidth={0.08} outlineColor="black">
               {isMonk ? `${defenderRoll}+` : displayDefender}
             </Text>
             <Text position={[0, -1.8, 1.1]} fontSize={0.5} color={isHealer ? "#81c784" : "#d4af37"} outlineWidth={0.05} outlineColor="black">
