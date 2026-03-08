@@ -17,7 +17,12 @@ export const useChessGame = (playSound: (name: any) => void) => {
   const [isVsAI, setIsVsAI] = useState(false);
   const [playerColor, setPlayerColor] = useState<'white' | 'black'>('white');
   const [turnCount, setTurnCount] = useState(1);
-  const [aiMoveSequence, setAiMoveSequence] = useState<{ step: number, move: { startX: number, startY: number, targetX: number, targetY: number }, aiColor?: 'white' | 'black' } | null>(null);
+  const [aiMoveSequence, setAiMoveSequence] = useState<{ 
+    step: number, 
+    move: { startX: number, startY: number, targetX: number, targetY: number }, 
+    aiColor?: 'white' | 'black',
+    actionType?: 'siege' | 'monk' | 'healer' | 'move'
+  } | null>(null);
   const [fogNear, setFogNear] = useState(10);
   const [fogFar, setFogFar] = useState(80);
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -40,6 +45,14 @@ export const useChessGame = (playSound: (name: any) => void) => {
   const [whiteSiegeUsed, setWhiteSiegeUsed] = useState(false);
   const [blackSiegeUsed, setBlackSiegeUsed] = useState(false);
   const [isSiegeFiring, setIsSiegeFiring] = useState<'white' | 'black' | null>(null);
+
+  const [whiteMonkUsed, setWhiteMonkUsed] = useState(false);
+  const [blackMonkUsed, setBlackMonkUsed] = useState(false);
+  const [selectedMonkColor, setSelectedMonkColor] = useState<'white' | 'black' | null>(null);
+
+  const [whiteHealerUsed, setWhiteHealerUsed] = useState(false);
+  const [blackHealerUsed, setBlackHealerUsed] = useState(false);
+  const [selectedHealerColor, setSelectedHealerColor] = useState<'white' | 'black' | null>(null);
 
   const fireSiege = (color: 'white' | 'black', targetX: number, targetY: number) => {
     if (color === 'white' && whiteSiegeUsed) return;
@@ -97,6 +110,133 @@ export const useChessGame = (playSound: (name: any) => void) => {
     }, 1500); 
   };
 
+  const performConversion = (color: 'white' | 'black', targetX: number, targetY: number) => {
+    if (color === 'white' && whiteMonkUsed) return;
+    if (color === 'black' && blackMonkUsed) return;
+    if (turn !== color || isRolling || isPaused || winner || !hasStarted) return;
+
+    const targetPiece = pieces.find(p => p.x === targetX && p.y === targetY);
+    if (!targetPiece || targetPiece.color === color || targetPiece.type === 'king' || targetPiece.type === 'queen') return;
+
+    if (color === 'white') setWhiteMonkUsed(true);
+    else setBlackMonkUsed(true);
+
+    playSound('select'); 
+    addLog(`${color.toUpperCase()} MONK attempts to convert ${targetPiece.color} ${targetPiece.type}!`, 'conversion');
+
+    setIsRolling(true);
+    const roll = Math.floor(Math.random() * 20) + 1; // D20 roll
+    
+    // Thresholds: Pawn > 16, Knight/Bishop > 18, Rook = 20 (> 19)
+    let threshold = 21; 
+    if (targetPiece.type === 'pawn') threshold = 16;
+    else if (targetPiece.type === 'knight' || targetPiece.type === 'bishop') threshold = 18;
+    else if (targetPiece.type === 'rook') threshold = 19;
+
+    const success = roll > threshold;
+
+    setBattleResult({
+      attackerRoll: roll,
+      attackerTotal: roll,
+      attackerStats: 0,
+      attackerDice: 20,
+      attackerColor: color,
+      defenderRoll: threshold + 1, // Show the target roll needed
+      defenderTotal: threshold + 1,
+      defenderStats: 0,
+      defenderDice: 0,
+      defenderDebuff: 0,
+      isMonk: true,
+      success,
+      targetX,
+      targetY
+    });
+
+    setTimeout(() => {
+      setIsRolling(false);
+      if (success) {
+        playSound('promotion');
+        addLog(`${color.toUpperCase()} MONK successfully converted the ${targetPiece.type}!`, 'promotion');
+        setPieces(prev => prev.map(p => {
+          if (p.id === targetPiece.id) {
+            return { ...p, color, hasMoved: true };
+          }
+          return p;
+        }));
+      } else {
+        playSound('defeat');
+        addLog(`${color.toUpperCase()} MONK failed the conversion (Rolled ${roll}).`, 'conversion');
+      }
+      setTimeout(() => {
+        nextTurn(color);
+      }, 1000);
+    }, 1500);
+  };
+
+  const performHeal = (color: 'white' | 'black', targetX: number, targetY: number) => {
+    if (color === 'white' && whiteHealerUsed) return;
+    if (color === 'black' && blackHealerUsed) return;
+    if (turn !== color || isRolling || isPaused || winner || !hasStarted) return;
+
+    const targetPiece = pieces.find(p => p.x === targetX && p.y === targetY);
+    if (!targetPiece || targetPiece.color !== color) return;
+
+    if (color === 'white') setWhiteHealerUsed(true);
+    else setBlackHealerUsed(true);
+
+    playSound('select'); 
+    addLog(`${color.toUpperCase()} HEALER attempts to heal ${targetPiece.type}!`, 'heal');
+
+    setIsRolling(true);
+    const roll = Math.floor(Math.random() * 16) + 1; // D16
+    
+    let healAmount = 0;
+    if (roll > 10 && roll <= 12) healAmount = 5;
+    else if (roll === 13) healAmount = 6;
+    else if (roll === 14) healAmount = 7;
+    else if (roll === 15) healAmount = 8;
+    else if (roll === 16) healAmount = 10;
+
+    const success = healAmount > 0;
+
+    setBattleResult({
+      attackerRoll: roll,
+      attackerTotal: healAmount, // Use total to store heal amount for UI
+      attackerStats: 0,
+      attackerDice: 16,
+      attackerColor: color,
+      defenderRoll: targetPiece.hp,
+      defenderTotal: Math.min(targetPiece.maxHp, targetPiece.hp + healAmount),
+      defenderStats: 0,
+      defenderDice: 0,
+      defenderDebuff: 0,
+      isHealer: true,
+      success,
+      targetX,
+      targetY
+    });
+
+    setTimeout(() => {
+      setIsRolling(false);
+      if (success) {
+        playSound('castle'); 
+        addLog(`${color.toUpperCase()} HEALER restored ${healAmount} HP to the ${targetPiece.type}!`, 'heal');
+        setPieces(prev => prev.map(p => {
+          if (p.id === targetPiece.id) {
+            return { ...p, hp: Math.min(p.maxHp, p.hp + healAmount) };
+          }
+          return p;
+        }));
+      } else {
+        playSound('defeat');
+        addLog(`${color.toUpperCase()} HEALER failed to restore HP (Rolled ${roll}).`, 'heal');
+      }
+      setTimeout(() => {
+        nextTurn(color);
+      }, 1000);
+    }, 1500);
+  };
+
   const resetGame = () => {
     setPieces(setupBoard());
     setTurn('white');
@@ -111,6 +251,12 @@ export const useChessGame = (playSound: (name: any) => void) => {
     setWhiteSiegeUsed(false);
     setBlackSiegeUsed(false);
     setIsSiegeFiring(null);
+    setWhiteMonkUsed(false);
+    setBlackMonkUsed(false);
+    setSelectedMonkColor(null);
+    setWhiteHealerUsed(false);
+    setBlackHealerUsed(false);
+    setSelectedHealerColor(null);
   };
 
   const getPieceAt = (x: number, y: number) => pieces.find(p => p.x === x && p.y === y);
@@ -133,6 +279,32 @@ export const useChessGame = (playSound: (name: any) => void) => {
     playSound('select');
     setSelectedOnagerColor(color);
     setSelectedPieceId(null);
+    setSelectedMonkColor(null);
+    setSelectedHealerColor(null);
+  };
+
+  const handleMonkClick = (color: 'white' | 'black') => {
+    if (isRolling || isPaused || winner || !hasStarted || turn !== color) return;
+    if (color === 'white' && whiteMonkUsed) return;
+    if (color === 'black' && blackMonkUsed) return;
+
+    playSound('select');
+    setSelectedMonkColor(color);
+    setSelectedPieceId(null);
+    setSelectedOnagerColor(null);
+    setSelectedHealerColor(null);
+  };
+
+  const handleHealerClick = (color: 'white' | 'black') => {
+    if (isRolling || isPaused || winner || !hasStarted || turn !== color) return;
+    if (color === 'white' && whiteHealerUsed) return;
+    if (color === 'black' && blackHealerUsed) return;
+
+    playSound('select');
+    setSelectedHealerColor(color);
+    setSelectedPieceId(null);
+    setSelectedOnagerColor(null);
+    setSelectedMonkColor(null);
   };
 
   const handleSquareClick = (x: number, y: number, isAiCall: boolean = false) => {
@@ -157,6 +329,32 @@ export const useChessGame = (playSound: (name: any) => void) => {
       }
       // If we clicked something else, deselect onager
       setSelectedOnagerColor(null);
+    }
+
+    // Case 2: Monk is selected
+    if (selectedMonkColor) {
+      const clickedPiece = getPieceAt(x, y);
+      const isInRange = selectedMonkColor === 'white' ? (y <= 3) : (y >= 4);
+      
+      if (clickedPiece && clickedPiece.color !== selectedMonkColor && clickedPiece.type !== 'king' && clickedPiece.type !== 'queen' && isInRange) {
+        performConversion(selectedMonkColor, x, y);
+        setSelectedMonkColor(null);
+        return;
+      }
+      setSelectedMonkColor(null);
+    }
+
+    // Case 3: Healer is selected
+    if (selectedHealerColor) {
+      const clickedPiece = getPieceAt(x, y);
+      const isInRange = selectedHealerColor === 'white' ? (y <= 3) : (y >= 4);
+      
+      if (clickedPiece && clickedPiece.color === selectedHealerColor && isInRange) {
+        performHeal(selectedHealerColor, x, y);
+        setSelectedHealerColor(null);
+        return;
+      }
+      setSelectedHealerColor(null);
     }
 
     const clickedPiece = getPieceAt(x, y);
@@ -365,28 +563,51 @@ export const useChessGame = (playSound: (name: any) => void) => {
       // Small delay to simulate "thinking" and let the UI settle
       const thinkTimer = setTimeout(() => {
         const siegeUsed = aiColor === 'white' ? whiteSiegeUsed : blackSiegeUsed;
-        const move = calculateBestMove(pieces, aiColor, siegeUsed);
+        const monkUsed = aiColor === 'white' ? whiteMonkUsed : blackMonkUsed;
+        const healerUsed = aiColor === 'white' ? whiteHealerUsed : blackHealerUsed;
+        
+        const move = calculateBestMove(pieces, aiColor, siegeUsed, monkUsed, healerUsed);
         if (move) {
+          let actionType: 'siege' | 'monk' | 'healer' | 'move' = 'move';
+          let startX = move.piece.x;
+          let startY = move.piece.y;
+
           if (move.isSiege) {
-            setAiMoveSequence({ step: 1, move: { startX: -1, startY: -1, targetX: move.target.x, targetY: move.target.y }, aiColor });
-          } else {
-            setAiMoveSequence({ step: 1, move: { startX: move.piece.x, startY: move.piece.y, targetX: move.target.x, targetY: move.target.y }, aiColor });
+            actionType = 'siege';
+            startX = -1;
+          } else if (move.isMonk) {
+            actionType = 'monk';
+            startX = -2;
+          } else if (move.isHealer) {
+            actionType = 'healer';
+            startX = -3;
           }
+
+          setAiMoveSequence({ 
+            step: 1, 
+            move: { startX, startY, targetX: move.target.x, targetY: move.target.y }, 
+            aiColor,
+            actionType
+          });
         }
       }, 800);
       return () => clearTimeout(thinkTimer);
     }
-  }, [pieces, turn, isVsAI, playerColor, isRolling, isPaused, winner, hasStarted, aiMoveSequence, battleResult, whiteSiegeUsed, blackSiegeUsed, isSiegeFiring]);
+  }, [pieces, turn, isVsAI, playerColor, isRolling, isPaused, winner, hasStarted, aiMoveSequence, battleResult, whiteSiegeUsed, blackSiegeUsed, whiteMonkUsed, blackMonkUsed, whiteHealerUsed, blackHealerUsed, isSiegeFiring]);
 
   useEffect(() => {
     if (aiMoveSequence && !isPaused && !winner) {
-      const isSiege = aiMoveSequence.move.startX === -1;
       const aiColor = aiMoveSequence.aiColor || (playerColor === 'white' ? 'black' : 'white');
+      const actionType = aiMoveSequence.actionType || 'move';
 
       if (aiMoveSequence.step === 1) {
         const timer = setTimeout(() => {
-          if (isSiege) {
+          if (actionType === 'siege') {
             handleOnagerClick(aiColor);
+          } else if (actionType === 'monk') {
+            handleMonkClick(aiColor);
+          } else if (actionType === 'healer') {
+            handleHealerClick(aiColor);
           } else {
             handleSquareClick(aiMoveSequence.move.startX, aiMoveSequence.move.startY, true);
           }
@@ -401,7 +622,7 @@ export const useChessGame = (playSound: (name: any) => void) => {
         return () => clearTimeout(timer);
       }
     }
-  }, [aiMoveSequence, isPaused, winner, handleSquareClick, handleOnagerClick, playerColor]);
+  }, [aiMoveSequence, isPaused, winner, handleSquareClick, handleOnagerClick, handleMonkClick, handleHealerClick, playerColor]);
   // --------------
 
   return {
@@ -445,6 +666,14 @@ export const useChessGame = (playSound: (name: any) => void) => {
     blackSiegeUsed,
     isSiegeFiring,
     fireSiege,
-    selectedOnagerColor
+    selectedOnagerColor,
+    whiteMonkUsed,
+    blackMonkUsed,
+    selectedMonkColor,
+    handleMonkClick,
+    whiteHealerUsed,
+    blackHealerUsed,
+    selectedHealerColor,
+    handleHealerClick
   };
 };

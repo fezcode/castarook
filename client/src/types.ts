@@ -34,6 +34,8 @@ export interface BattleResult {
   defenderDice: number;
   defenderDebuff: number;
   isSiege?: boolean; // New flag for siege attacks
+  isMonk?: boolean; // New flag for monk conversion
+  isHealer?: boolean; // New flag for healer healing
   success: boolean;
   targetX: number;
   targetY: number;
@@ -42,6 +44,6 @@ export interface BattleResult {
 export interface LogEntry {
   id: string;
   message: string;
-  type: 'move' | 'attack' | 'kill' | 'promotion' | 'castle' | 'siege';
+  type: 'move' | 'attack' | 'kill' | 'promotion' | 'castle' | 'siege' | 'conversion' | 'heal';
   timestamp: number;
 }

@@ -38,6 +38,13 @@ interface Props {
   turnCount: number;
   whiteSiegeUsed: boolean;
   blackSiegeUsed: boolean;
+  whiteMonkUsed: boolean;
+  blackMonkUsed: boolean;
+  whiteHealerUsed: boolean;
+  blackHealerUsed: boolean;
+  selectedOnagerColor: 'white' | 'black' | null;
+  selectedMonkColor: 'white' | 'black' | null;
+  selectedHealerColor: 'white' | 'black' | null;
   fireSiege: (color: 'white' | 'black', targetX: number, targetY: number) => void;
   volume: number;
   setVolume: (v: number) => void;
@@ -55,6 +62,7 @@ interface Props {
   setFogNear, setFogFar,
   setHasStarted, setIsNight, setIsPaused, resetGame, setBattleResult,
   isVsAI, setIsVsAI, playerColor, setPlayerColor, turnCount, whiteSiegeUsed, blackSiegeUsed,
+  whiteMonkUsed, blackMonkUsed, whiteHealerUsed, blackHealerUsed,
   volume, setVolume, isMuted, setIsMuted, startMusic, playSound
   }) => {
   const [isTutorialOpen, setIsTutorialOpen] = React.useState(false);
@@ -227,13 +235,32 @@ interface Props {
             <span style={{ fontWeight: 'bold' }}>{blackPieces.length} Units ({blackKills} Kills)</span>
           </div>
           <div style={{ fontSize: '11px', color: '#aaa', borderTop: '1px solid rgba(212, 175, 55, 0.2)', paddingTop: '8px' }}>
+            <div style={{ marginBottom: '8px', borderBottom: '1px solid rgba(212, 175, 55, 0.1)', paddingBottom: '4px', color: '#f0d9b5' }}>WHITE SUPPORT</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <span>Onager (White):</span>
+              <span>Onager:</span>
               <span style={{ color: whiteSiegeUsed ? '#f44336' : '#4caf50' }}>{whiteSiegeUsed ? 'DEPLETED' : 'READY'}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Onager (Black):</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span>Monk:</span>
+              <span style={{ color: whiteMonkUsed ? '#f44336' : '#4caf50' }}>{whiteMonkUsed ? 'DEPLETED' : 'READY'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span>Healer:</span>
+              <span style={{ color: whiteHealerUsed ? '#f44336' : '#4caf50' }}>{whiteHealerUsed ? 'DEPLETED' : 'READY'}</span>
+            </div>
+
+            <div style={{ marginBottom: '8px', borderBottom: '1px solid rgba(212, 175, 55, 0.1)', paddingBottom: '4px', color: '#f0d9b5' }}>BLACK SUPPORT</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span>Onager:</span>
               <span style={{ color: blackSiegeUsed ? '#f44336' : '#4caf50' }}>{blackSiegeUsed ? 'DEPLETED' : 'READY'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <span>Monk:</span>
+              <span style={{ color: blackMonkUsed ? '#f44336' : '#4caf50' }}>{blackMonkUsed ? 'DEPLETED' : 'READY'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Healer:</span>
+              <span style={{ color: blackHealerUsed ? '#f44336' : '#4caf50' }}>{blackHealerUsed ? 'DEPLETED' : 'READY'}</span>
             </div>
           </div>
         </div>
@@ -325,11 +352,11 @@ interface Props {
                 <li><strong>Skirmishes:</strong> Every unit has a unique die (Pawn: D6, Knight: D10, Bishop: D12, Rook: D15, Queen: D18, King: D20).</li>
                 <li><strong>Valor & Health:</strong> Totals include battle-hardened stats (max +5). Damage is dealt based on the roll difference. Units perish only at 0 HP.</li>
                 <li><strong>Opportunity Attack:</strong> Any unit that has just moved becomes <strong>Vulnerable (-2 Defense)</strong> until the start of its next turn.</li>
-                <li><strong>Advanced Maneuvers:</strong>
+                <li><strong>Support Units (One-time use, 4-row range):</strong>
                   <ul style={{ color: '#d4af37' }}>
-                    <li>Promotion: Reach the end to crown a Queen.</li>
-                    <li>Castling: King and Rook may pivot if unmoved.</li>
-                    <li>Siege Engine: Fire your Onager once per match to rain destruction on the nearest 4 rows (12-16 DMG).</li>
+                    <li><strong>Monk:</strong> Roll D20 to convert enemies (Target: Pawn 17+, Knight/Elephant 19+, Rook 20). Kings and Queens are immune.</li>
+                    <li><strong>Healer:</strong> Roll D16 to restore HP (Roll 11-12: +5 HP, 13: +6 HP, 14: +7 HP, 15: +8 HP, 16: +10 HP).</li>
+                    <li><strong>Onager:</strong> Rain destruction from the shadows (12-16 DMG).</li>
                   </ul>
                 </li>
                 <li><strong>Observation:</strong>
@@ -625,6 +652,28 @@ interface Props {
               <div style={{ fontSize: '22px', color: '#ff5722' }}>
                 Siege Onslaught: <strong>{battleResult.attackerTotal} DMG</strong> dealt to defender!
               </div>
+            ) : battleResult.isMonk ? (
+              <div style={{ fontSize: '22px', color: battleResult.success ? '#d4af37' : '#f44336' }}>
+                Monk Ritual: Rolled <strong>{battleResult.attackerRoll}</strong> (Target: {battleResult.defenderRoll}+)
+                <br />
+                {battleResult.success ? 'CONVERSION SUCCESSFUL!' : 'CONVERSION FAILED!'}
+              </div>
+            ) : battleResult.isHealer ? (
+              <div style={{ fontSize: '22px', color: battleResult.success ? '#4caf50' : '#f44336' }}>
+                {battleResult.success ? (
+                  <>
+                    Healer Blessing: Restored <strong>{battleResult.attackerTotal} HP</strong>
+                    <br />
+                    Target HP: {battleResult.defenderRoll} ➜ {battleResult.defenderTotal}
+                  </>
+                ) : (
+                  <>
+                    Heal Failed: Rolled <strong>{battleResult.attackerRoll}</strong>
+                    <br />
+                    (Needs 11+ to restore HP)
+                  </>
+                )}
+              </div>
             ) : (
               <>
                 <div style={{ fontSize: '22px', marginBottom: '12px', color: '#d4af37' }}>
@@ -637,7 +686,10 @@ interface Props {
             )}
           </div>
           <h2 style={{ fontSize: '24px', margin: '0 0 25px 0', opacity: 0.9, fontStyle: 'italic' }}>
-            {battleResult.isSiege ? 'Brute force from the shadows!' : (battleResult.success ? 'The objective is secured!' : 'The onslaught was resisted!')}
+            {battleResult.isSiege ? 'Brute force from the shadows!' : 
+             battleResult.isMonk ? (battleResult.success ? 'The soul has been swayed!' : 'Their faith remained unshaken!') :
+             battleResult.isHealer ? 'The wounds begin to close!' :
+             (battleResult.success ? 'The objective is secured!' : 'The onslaught was resisted!')}
           </h2>
           <button 
             onClick={() => { setBattleResult(null); playSound('menu'); }}

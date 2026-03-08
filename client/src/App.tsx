@@ -61,7 +61,9 @@ function App() {
     setBoardStyle, setWindStrength, setWhiteColor, setBlackColor, setShowCoordinates,
     setHasStarted, setIsNight, setIsPaused, setFogNear, setFogFar,
     resetGame, handleSquareClick, handleOnagerClick, setBattleResult, isVsAI, setIsVsAI, playerColor, setPlayerColor, turnCount,
-    whiteSiegeUsed, blackSiegeUsed, isSiegeFiring, fireSiege, selectedOnagerColor
+    whiteSiegeUsed, blackSiegeUsed, isSiegeFiring, fireSiege, selectedOnagerColor,
+    whiteMonkUsed, blackMonkUsed, selectedMonkColor, handleMonkClick,
+    whiteHealerUsed, blackHealerUsed, selectedHealerColor, handleHealerClick
   } = useChessGame(playSound);
 
   const selectedPiece = useMemo(() => 
@@ -112,16 +114,29 @@ function App() {
             whiteColor={whiteColor}
             blackColor={blackColor}
             onOnagerClick={handleOnagerClick}
+            whiteMonkUsed={whiteMonkUsed}
+            blackMonkUsed={blackMonkUsed}
+            selectedMonkColor={selectedMonkColor}
+            onMonkClick={handleMonkClick}
+            whiteHealerUsed={whiteHealerUsed}
+            blackHealerUsed={blackHealerUsed}
+            selectedHealerColor={selectedHealerColor}
+            onHealerClick={handleHealerClick}
           />
           <ChessBoard 
             pieces={pieces} 
             selectedPieceId={selectedPieceId} 
             validMoves={validMoves} 
-            highlightSquares={selectedOnagerColor ? 
-              pieces.filter(p => p.color !== selectedOnagerColor && (selectedOnagerColor === 'white' ? p.y <= 3 : p.y >= 4)).map(p => ({ x: p.x, y: p.y }))
+            highlightSquares={
+              selectedOnagerColor ? 
+                pieces.filter(p => p.color !== selectedOnagerColor && (selectedOnagerColor === 'white' ? p.y <= 3 : p.y >= 4)).map(p => ({ x: p.x, y: p.y }))
+              : selectedMonkColor ?
+                pieces.filter(p => p.color !== selectedMonkColor && p.type !== 'king' && p.type !== 'queen' && (selectedMonkColor === 'white' ? p.y <= 3 : p.y >= 4)).map(p => ({ x: p.x, y: p.y }))
+              : selectedHealerColor ?
+                pieces.filter(p => p.color === selectedHealerColor && (selectedHealerColor === 'white' ? p.y <= 3 : p.y >= 4)).map(p => ({ x: p.x, y: p.y }))
               : []
             }
-            highlightColor={selectedOnagerColor ? "#f44336" : undefined}
+            highlightColor={selectedOnagerColor ? "#f44336" : selectedMonkColor ? "#d4af37" : selectedHealerColor ? "#4caf50" : undefined}
             onSquareClick={handleSquareClick} 
             boardStyle={boardStyle}
             showCoordinates={showCoordinates}
@@ -150,6 +165,8 @@ function App() {
              defenderDice={battleResult.defenderDice}
              defenderDebuff={battleResult.defenderDebuff}
              isSiege={battleResult.isSiege}
+             isMonk={battleResult.isMonk}
+             isHealer={battleResult.isHealer}
              isRolling={isRolling} 
            />
         )}
@@ -200,6 +217,13 @@ function App() {
         turnCount={turnCount}
         whiteSiegeUsed={whiteSiegeUsed}
         blackSiegeUsed={blackSiegeUsed}
+        whiteMonkUsed={whiteMonkUsed}
+        blackMonkUsed={blackMonkUsed}
+        whiteHealerUsed={whiteHealerUsed}
+        blackHealerUsed={blackHealerUsed}
+        selectedOnagerColor={selectedOnagerColor}
+        selectedMonkColor={selectedMonkColor}
+        selectedHealerColor={selectedHealerColor}
         fireSiege={fireSiege}
         volume={volume}
         setVolume={setVolume}

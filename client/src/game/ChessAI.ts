@@ -23,11 +23,16 @@ const evaluatePiece = (piece: Piece): number => {
 export const calculateBestMove = (
   pieces: Piece[], 
   color: PlayerColor, 
-  siegeUsed: boolean
-): { piece: Piece, target: Position, score: number, isSiege?: boolean } | null => {
+  siegeUsed: boolean,
+  monkUsed: boolean,
+  healerUsed: boolean
+): { piece: Piece, target: Position, score: number, isSiege?: boolean, isMonk?: boolean, isHealer?: boolean } | null => {
   const myPieces = pieces.filter(p => p.color === color && p.hp > 0);
   const enemyPieces = pieces.filter(p => p.color !== color && p.hp > 0);
   const myKing = myPieces.find(p => p.type === 'king');
+
+  // Support range restriction
+  const rangeY = color === 'black' ? [4, 5, 6, 7] : [0, 1, 2, 3];
 
   // --- Defensive Analysis ---
   // Identify all squares currently threatened by the enemy
@@ -39,12 +44,11 @@ export const calculateBestMove = (
 
   const isKingThreatened = myKing && threatenedSquares.has(`${myKing.x},${myKing.y}`);
 
-  let bestMove: { piece: Piece, target: Position, score: number, isSiege?: boolean } | null = null;
+  let bestMove: { piece: Piece, target: Position, score: number, isSiege?: boolean, isMonk?: boolean, isHealer?: boolean } | null = null;
   let bestScore = -Infinity;
 
   // --- Consider Siege Attack ---
   if (!siegeUsed) {
-    const rangeY = color === 'black' ? [4, 5, 6, 7] : [0, 1, 2, 3];
     const targets = enemyPieces.filter(p => rangeY.includes(p.y));
     
     for (const target of targets) {
@@ -58,7 +62,6 @@ export const calculateBestMove = (
         score = avgDmg * 2;
       }
 
-      // If our King is in danger, prioritizing Siege on the biggest threat might help
       if (isKingThreatened) score += 1000; 
 
       if (score > bestScore) {
@@ -68,6 +71,44 @@ export const calculateBestMove = (
           target: { x: target.x, y: target.y }, 
           score, 
           isSiege: true 
+        };
+      }
+    }
+  }
+
+  // --- Consider Monk Conversion ---
+  if (!monkUsed) {
+    const targets = enemyPieces.filter(p => rangeY.includes(p.y) && p.type !== 'king' && p.type !== 'queen');
+    for (const target of targets) {
+      // D20 roll vs 12 threshold (45% success)
+      let score = evaluatePiece(target) * 2.5; 
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = {
+          piece: { id: 'monk' } as Piece,
+          target: { x: target.x, y: target.y },
+          score,
+          isMonk: true
+        };
+      }
+    }
+  }
+
+  // --- Consider Healer Healing ---
+  if (!healerUsed) {
+    const wounded = myPieces.filter(p => rangeY.includes(p.y) && p.hp < p.maxHp);
+    for (const p of wounded) {
+      const missingHp = p.maxHp - p.hp;
+      const avgHeal = 10;
+      let score = Math.min(missingHp, avgHeal) * 5;
+      if (p.type === 'king') score += 2000;
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = {
+          piece: { id: 'healer' } as Piece,
+          target: { x: p.x, y: p.y },
+          score,
+          isHealer: true
         };
       }
     }

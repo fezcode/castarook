@@ -676,6 +676,218 @@ const Onager = ({ position, rotationY = 0, isNight, isUsed, isSelected, color, o
   );
 };
 
+const Monk = ({ position, rotationY = 0, isUsed, isSelected, color, onClick }: {
+  position: [number, number, number],
+  rotationY?: number,
+  isUsed: boolean,
+  isSelected?: boolean,
+  color: string,
+  onClick: () => void
+}) => {
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered && !isUsed);
+
+  return (
+    <group
+      position={position}
+      rotation={[0, rotationY, 0]}
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      {isSelected && (
+        <group>
+          <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.6, 0.8, 32]} />
+            <meshBasicMaterial color={color} transparent opacity={0.4} side={THREE.DoubleSide} />
+          </mesh>
+          <Sparkles count={15} scale={1} size={2} speed={1.5} color={color} />
+        </group>
+      )}
+
+      <group scale={0.45} position={[0, 0, 0]} rotation={isUsed ? [0.3, 0, 0] : [0, 0, 0]}>
+        {/* Robe/Body - More layered */}
+        <mesh castShadow position={[0, isUsed ? 0.6 : 1, 0]}>
+          <cylinderGeometry args={[0.6, 0.9, isUsed ? 1.2 : 2, 16]} />
+          <meshStandardMaterial color={isUsed ? "#333" : "#4a332c"} />
+        </mesh>
+        {/* Inner Robe Detail */}
+        <mesh position={[0, isUsed ? 0.6 : 1, 0.45]}>
+          <planeGeometry args={[0.4, isUsed ? 1.0 : 1.8]} />
+          <meshStandardMaterial color={isUsed ? "#555" : "#d4af37"} />
+        </mesh>
+        
+        {/* Shoulders/Capelet */}
+        <mesh castShadow position={[0, isUsed ? 1.3 : 2, 0]}>
+          <cylinderGeometry args={[0.7, 0.7, isUsed ? 0.3 : 0.5, 16]} />
+          <meshStandardMaterial color={isUsed ? "#222" : "#3e2723"} />
+        </mesh>
+
+        {/* Head with Hood */}
+        <group position={[0, isUsed ? 1.7 : 2.7, 0]}>
+          {/* Face */}
+          <mesh castShadow>
+            <sphereGeometry args={[0.35, 16, 16]} />
+            <meshStandardMaterial color="#f5cba7" />
+          </mesh>
+          {/* Hood */}
+          <mesh castShadow position={[0, 0.1, -0.1]} rotation={[0.2, 0, 0]}>
+            <sphereGeometry args={[0.42, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.5]} />
+            <meshStandardMaterial color={isUsed ? "#222" : "#4a332c"} side={THREE.DoubleSide} />
+          </mesh>
+        </group>
+
+        {/* Improved Wand */}
+        <group position={[0.8, isUsed ? 0.2 : 1.6, 0.3]} rotation={isUsed ? [Math.PI/2, 0, 0.5] : [0.4, 0, 0.1]}>
+          <mesh castShadow>
+            <cylinderGeometry args={[0.04, 0.06, 2.2, 8]} />
+            <meshStandardMaterial color="#2a1a0a" />
+          </mesh>
+          {/* Wand Detail (Gold bands) */}
+          {[0.5, -0.5].map(y => (
+             <mesh key={y} position={[0, y, 0]}>
+               <torusGeometry args={[0.07, 0.02, 8, 16]} />
+               <meshStandardMaterial color={isUsed ? "#555" : "#d4af37"} metalness={1} />
+             </mesh>
+          ))}
+          {/* Wand Head - Ornate */}
+          <group position={[0, 1.2, 0]}>
+            <mesh castShadow>
+              <boxGeometry args={[0.25, 0.4, 0.25]} />
+              <meshStandardMaterial color={isUsed ? "#444" : "#d4af37"} metalness={0.8} />
+            </mesh>
+            <mesh position={[0, 0.3, 0]}>
+              <sphereGeometry args={[0.2, 12, 12]} />
+              <meshStandardMaterial color={isUsed ? "#222" : color} emissive={isUsed ? "#000" : color} emissiveIntensity={isSelected ? 3 : 1} />
+            </mesh>
+            {!isUsed && <Sparkles count={5} scale={0.5} size={2} color={color} />}
+          </group>
+        </group>
+
+        {/* Halo */}
+        {!isUsed && (
+          <Float speed={3} rotationIntensity={0.1} floatIntensity={0.2}>
+            <mesh position={[0, 3.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
+              <torusGeometry args={[0.4, 0.03, 8, 32]} />
+              <meshStandardMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={2} />
+            </mesh>
+          </Float>
+        )}
+      </group>
+    </group>
+  );
+};
+
+const Healer = ({ position, rotationY = 0, isUsed, isSelected, color, onClick }: {
+  position: [number, number, number],
+  rotationY?: number,
+  isUsed: boolean,
+  isSelected?: boolean,
+  color: string,
+  onClick: () => void
+}) => {
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered && !isUsed);
+
+  return (
+    <group
+      position={position}
+      rotation={[0, rotationY, 0]}
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      {isSelected && (
+        <group>
+          <mesh position={[0, 0.1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.6, 0.8, 32]} />
+            <meshBasicMaterial color={color} transparent opacity={0.4} side={THREE.DoubleSide} />
+          </mesh>
+          <Sparkles count={15} scale={1} size={2} speed={1.5} color={color} />
+        </group>
+      )}
+
+      <group scale={0.45} position={[0, 0, 0]} rotation={isUsed ? [0.3, 0, 0] : [0, 0, 0]}>
+        {/* Body - Professional Coat */}
+        <mesh castShadow position={[0, isUsed ? 0.7 : 1.1, 0]}>
+          <boxGeometry args={[1, isUsed ? 1.4 : 2.2, 0.7]} />
+          <meshStandardMaterial color={isUsed ? "#333" : "#ffffff"} />
+        </mesh>
+        {/* Coat Split Detail */}
+        <mesh position={[0, isUsed ? 0.4 : 0.6, 0.36]}>
+          <planeGeometry args={[0.1, isUsed ? 0.8 : 1.2]} />
+          <meshStandardMaterial color="#ddd" />
+        </mesh>
+        
+        {/* Arms */}
+        {[-0.6, 0.6].map(x => (
+          <mesh key={x} castShadow position={[x, isUsed ? 0.8 : 1.4, isUsed ? 0.2 : 0]}>
+            <boxGeometry args={[0.25, isUsed ? 0.8 : 1.2, 0.3]} />
+            <meshStandardMaterial color={isUsed ? "#222" : "#ffffff"} />
+          </mesh>
+        ))}
+
+        {/* Head with Medical Cap */}
+        <group position={[0, isUsed ? 1.7 : 2.6, 0]}>
+          <mesh castShadow>
+            <sphereGeometry args={[0.38, 16, 16]} />
+            <meshStandardMaterial color="#f5cba7" />
+          </mesh>
+          {/* Cap */}
+          <mesh position={[0, 0.3, 0]}>
+            <cylinderGeometry args={[0.4, 0.4, 0.2, 16]} />
+            <meshStandardMaterial color={isUsed ? "#222" : "#f0f0f0"} />
+          </mesh>
+          {/* Red Cross on Cap */}
+          <mesh position={[0, 0.3, 0.41]}>
+             <boxGeometry args={[0.15, 0.04, 0.02]} />
+             <meshStandardMaterial color="#f44336" />
+          </mesh>
+          <mesh position={[0, 0.3, 0.41]}>
+             <boxGeometry args={[0.04, 0.15, 0.02]} />
+             <meshStandardMaterial color="#f44336" />
+          </mesh>
+        </group>
+
+        {/* Improved Medical Kit */}
+        <group position={[0.8, isUsed ? 0.2 : 0.6, 0.3]} rotation={isUsed ? [0, -0.5, 0] : [0, -0.2, 0]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.7, 0.6, 0.4]} />
+            <meshStandardMaterial color={isUsed ? "#444" : "#eee"} roughness={0.3} metalness={0.2} />
+          </mesh>
+          {/* Handle */}
+          <mesh position={[0, 0.4, 0]}>
+            <torusGeometry args={[0.15, 0.04, 8, 16, Math.PI]} />
+            <meshStandardMaterial color={isUsed ? "#222" : "#333"} />
+          </mesh>
+          {/* Red Cross */}
+          <mesh position={[0, 0, 0.21]}>
+            <boxGeometry args={[0.4, 0.1, 0.02]} />
+            <meshStandardMaterial color={isUsed ? "#666" : "#f44336"} />
+          </mesh>
+          <mesh position={[0, 0, 0.21]}>
+            <boxGeometry args={[0.1, 0.4, 0.02]} />
+            <meshStandardMaterial color={isUsed ? "#666" : "#f44336"} />
+          </mesh>
+          {/* Latches */}
+          {[-0.2, 0.2].map(x => (
+             <mesh key={x} position={[x, 0.1, 0.2]}>
+               <boxGeometry args={[0.1, 0.15, 0.05]} />
+               <meshStandardMaterial color={isUsed ? "#222" : "#999"} metalness={1} />
+             </mesh>
+          ))}
+        </group>
+        
+        {/* Stethoscope around neck */}
+        <mesh position={[0, isUsed ? 1.2 : 2, 0.4]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.4, 0.02, 8, 32, Math.PI]} />
+          <meshStandardMaterial color={isUsed ? "#222" : "#333"} />
+        </mesh>
+      </group>
+    </group>
+  );
+};
+
 export const Scenery = ({ 
   isNight, 
   windStrength = 1.0, 
@@ -684,7 +896,15 @@ export const Scenery = ({
   selectedOnagerColor, 
   whiteColor, 
   blackColor, 
-  onOnagerClick 
+  onOnagerClick,
+  whiteMonkUsed,
+  blackMonkUsed,
+  selectedMonkColor,
+  onMonkClick,
+  whiteHealerUsed,
+  blackHealerUsed,
+  selectedHealerColor,
+  onHealerClick
 }: { 
   isNight: boolean, 
   windStrength?: number,
@@ -693,7 +913,15 @@ export const Scenery = ({
   selectedOnagerColor: 'white' | 'black' | null,
   whiteColor: string,
   blackColor: string,
-  onOnagerClick: (color: 'white' | 'black') => void
+  onOnagerClick: (color: 'white' | 'black') => void,
+  whiteMonkUsed: boolean,
+  blackMonkUsed: boolean,
+  selectedMonkColor: 'white' | 'black' | null,
+  onMonkClick: (color: 'white' | 'black') => void,
+  whiteHealerUsed: boolean,
+  blackHealerUsed: boolean,
+  selectedHealerColor: 'white' | 'black' | null,
+  onHealerClick: (color: 'white' | 'black') => void
 }) => {
   const trees = useMemo(() => {
     const list = [];
@@ -798,6 +1026,23 @@ export const Scenery = ({
         color={whiteColor}
         onClick={() => onOnagerClick('white')}
       />
+      <Monk 
+        position={[-2.5, -0.15, -6.5]} 
+        rotationY={0}
+        isUsed={whiteMonkUsed}
+        isSelected={selectedMonkColor === 'white'}
+        color={whiteColor}
+        onClick={() => onMonkClick('white')}
+      />
+      <Healer
+        position={[2.5, -0.15, -6.5]}
+        rotationY={0}
+        isUsed={whiteHealerUsed}
+        isSelected={selectedHealerColor === 'white'}
+        color={whiteColor}
+        onClick={() => onHealerClick('white')}
+      />
+
       <Onager 
         position={[0, -0.15, 6.5]} 
         rotationY={0} 
@@ -806,6 +1051,22 @@ export const Scenery = ({
         isSelected={selectedOnagerColor === 'black'}
         color={blackColor}
         onClick={() => onOnagerClick('black')}
+      />
+      <Monk
+        position={[2.5, -0.15, 6.5]}
+        rotationY={Math.PI}
+        isUsed={blackMonkUsed}
+        isSelected={selectedMonkColor === 'black'}
+        color={blackColor}
+        onClick={() => onMonkClick('black')}
+      />
+      <Healer
+        position={[-2.5, -0.15, 6.5]}
+        rotationY={Math.PI}
+        isUsed={blackHealerUsed}
+        isSelected={selectedHealerColor === 'black'}
+        color={blackColor}
+        onClick={() => onHealerClick('black')}
       />
 
       {decoItems.map((item) => <DecorativeItems key={`deco-${item.pos[0]}-${item.pos[2]}`} position={item.pos as [number, number, number]} rotationY={item.rot} />)}
